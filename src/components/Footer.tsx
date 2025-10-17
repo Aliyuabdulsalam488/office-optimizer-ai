@@ -5,7 +5,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-              AI Business Solutions
+              Techstora Hub
             </h3>
             <p className="text-muted-foreground max-w-md">
               Empowering businesses with intelligent automation for finance, procurement, HR, 
@@ -36,7 +36,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-border pt-8 text-center text-muted-foreground">
-          <p>&copy; 2025 AI Business Solutions. All rights reserved.</p>
+          <p>&copy; 2025 Techstora Hub. All rights reserved.</p>
         </div>
       </div>
     </footer>
