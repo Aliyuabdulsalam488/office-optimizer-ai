@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import FreddyChat from "./FreddyChat";
 
 const services = [
   {
@@ -35,8 +38,11 @@ const services = [
 ];
 
 const Services = () => {
+  const [showFreddyChat, setShowFreddyChat] = useState(false);
+
   return (
-    <section id="solutions" className="py-32 px-6 relative">
+    <>
+      <section id="solutions" className="py-32 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 animate-fade-in">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
@@ -50,6 +56,7 @@ const Services = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
+            const isFinance = service.title === "Finance Automation";
             return (
               <Card
                 key={index}
@@ -62,15 +69,25 @@ const Services = () => {
                 <h3 className="text-2xl font-bold mb-4 text-foreground group-hover:text-transparent group-hover:bg-gradient-primary group-hover:bg-clip-text transition-all">
                   {service.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed mb-4">
                   {service.description}
                 </p>
+                {isFinance && (
+                  <Button 
+                    onClick={() => setShowFreddyChat(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Chat with Freddy
+                  </Button>
+                )}
               </Card>
             );
           })}
         </div>
       </div>
     </section>
+    {showFreddyChat && <FreddyChat onClose={() => setShowFreddyChat(false)} />}
+    </>
   );
 };
 
