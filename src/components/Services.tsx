@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import FreddyChat from "./FreddyChat";
 import PennyChat from "./PennyChat";
 import HildaChat from "./HildaChat";
 import ClaraChat from "./ClaraChat";
 import SallyChat from "./SallyChat";
 import EvaChat from "./EvaChat";
+import { BusinessSetup } from "./BusinessSetup";
 import FinanceServiceSelector from "./FinanceServiceSelector";
 import ProcurementServiceSelector from "./ProcurementServiceSelector";
 import HRServiceSelector from "./HRServiceSelector";
@@ -16,6 +18,11 @@ import SalesServiceSelector from "./SalesServiceSelector";
 import ExecutiveServiceSelector from "./ExecutiveServiceSelector";
 
 const services = [
+  {
+    icon: Sparkles,
+    title: "Business Setup",
+    description: "Create and brand your new business with AI-powered name generation and branding guidelines.",
+  },
   {
     icon: DollarSign,
     title: "Finance Automation",
@@ -55,6 +62,7 @@ const Services = () => {
   const [showClaraChat, setShowClaraChat] = useState(false);
   const [showSallyChat, setShowSallyChat] = useState(false);
   const [showEvaChat, setShowEvaChat] = useState(false);
+  const [showBusinessSetup, setShowBusinessSetup] = useState(false);
   const [showFinanceSelector, setShowFinanceSelector] = useState(false);
   const [showProcurementSelector, setShowProcurementSelector] = useState(false);
   const [showHRSelector, setShowHRSelector] = useState(false);
@@ -84,6 +92,7 @@ const Services = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
+            const isBusinessSetup = service.title === "Business Setup";
             const isFinance = service.title === "Finance Automation";
             const isProcurement = service.title === "Procurement";
             const isHR = service.title === "HR Management";
@@ -105,6 +114,14 @@ const Services = () => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   {service.description}
                 </p>
+                {isBusinessSetup && (
+                  <Button 
+                    onClick={() => setShowBusinessSetup(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Create Your Business
+                  </Button>
+                )}
                 {isFinance && (
                   <Button 
                     onClick={() => setShowFinanceSelector(true)}
@@ -248,6 +265,13 @@ const Services = () => {
         onClose={() => setShowEvaChat(false)}
         serviceType={selectedExecutiveService}
       />
+    )}
+    {showBusinessSetup && (
+      <Dialog open={showBusinessSetup} onOpenChange={setShowBusinessSetup}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <BusinessSetup />
+        </DialogContent>
+      </Dialog>
     )}
     </>
   );
