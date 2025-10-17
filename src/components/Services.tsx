@@ -1,4 +1,4 @@
-import { DollarSign, ShoppingCart, Users, Calendar, Database } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const services = [
@@ -26,6 +26,11 @@ const services = [
     icon: Database,
     title: "Data Cleaning",
     description: "Automatically clean, organize, and standardize your business data.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Sales Automation",
+    description: "AI-powered lead generation, pipeline management, and sales forecasting.",
   },
 ];
 
