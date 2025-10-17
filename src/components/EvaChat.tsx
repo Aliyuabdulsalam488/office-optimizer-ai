@@ -14,9 +14,10 @@ interface Message {
 
 interface EvaChatProps {
   serviceType?: string;
+  onClose: () => void;
 }
 
-const EvaChat = ({ serviceType }: EvaChatProps) => {
+const EvaChat = ({ serviceType, onClose }: EvaChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

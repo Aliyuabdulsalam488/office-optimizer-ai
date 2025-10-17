@@ -6,10 +6,14 @@ import FreddyChat from "./FreddyChat";
 import PennyChat from "./PennyChat";
 import HildaChat from "./HildaChat";
 import ClaraChat from "./ClaraChat";
+import SallyChat from "./SallyChat";
+import EvaChat from "./EvaChat";
 import FinanceServiceSelector from "./FinanceServiceSelector";
 import ProcurementServiceSelector from "./ProcurementServiceSelector";
 import HRServiceSelector from "./HRServiceSelector";
 import DataCleaningServiceSelector from "./DataCleaningServiceSelector";
+import SalesServiceSelector from "./SalesServiceSelector";
+import ExecutiveServiceSelector from "./ExecutiveServiceSelector";
 
 const services = [
   {
@@ -49,14 +53,20 @@ const Services = () => {
   const [showPennyChat, setShowPennyChat] = useState(false);
   const [showHildaChat, setShowHildaChat] = useState(false);
   const [showClaraChat, setShowClaraChat] = useState(false);
+  const [showSallyChat, setShowSallyChat] = useState(false);
+  const [showEvaChat, setShowEvaChat] = useState(false);
   const [showFinanceSelector, setShowFinanceSelector] = useState(false);
   const [showProcurementSelector, setShowProcurementSelector] = useState(false);
   const [showHRSelector, setShowHRSelector] = useState(false);
   const [showDataCleaningSelector, setShowDataCleaningSelector] = useState(false);
+  const [showSalesSelector, setShowSalesSelector] = useState(false);
+  const [showExecutiveSelector, setShowExecutiveSelector] = useState(false);
   const [selectedFinanceService, setSelectedFinanceService] = useState<string>("");
   const [selectedProcurementService, setSelectedProcurementService] = useState<string>("");
   const [selectedHRService, setSelectedHRService] = useState<string>("");
   const [selectedDataCleaningService, setSelectedDataCleaningService] = useState<string>("");
+  const [selectedSalesService, setSelectedSalesService] = useState<string>("");
+  const [selectedExecutiveService, setSelectedExecutiveService] = useState<string>("");
 
   return (
     <>
@@ -78,6 +88,8 @@ const Services = () => {
             const isProcurement = service.title === "Procurement";
             const isHR = service.title === "HR Management";
             const isDataCleaning = service.title === "Data Cleaning";
+            const isSales = service.title === "Sales Automation";
+            const isExecutive = service.title === "Executive Assistant";
             return (
               <Card
                 key={index}
@@ -125,6 +137,22 @@ const Services = () => {
                     Explore Data Cleaning
                   </Button>
                 )}
+                {isSales && (
+                  <Button 
+                    onClick={() => setShowSalesSelector(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Explore Sales Services
+                  </Button>
+                )}
+                {isExecutive && (
+                  <Button 
+                    onClick={() => setShowExecutiveSelector(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Explore Executive Services
+                  </Button>
+                )}
               </Card>
             );
           })}
@@ -167,6 +195,24 @@ const Services = () => {
         setShowClaraChat(true);
       }}
     />
+    <SalesServiceSelector 
+      isOpen={showSalesSelector}
+      onClose={() => setShowSalesSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedSalesService(serviceType);
+        setShowSalesSelector(false);
+        setShowSallyChat(true);
+      }}
+    />
+    <ExecutiveServiceSelector 
+      isOpen={showExecutiveSelector}
+      onClose={() => setShowExecutiveSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedExecutiveService(serviceType);
+        setShowExecutiveSelector(false);
+        setShowEvaChat(true);
+      }}
+    />
     {showFreddyChat && (
       <FreddyChat 
         onClose={() => setShowFreddyChat(false)}
@@ -189,6 +235,18 @@ const Services = () => {
       <ClaraChat 
         onClose={() => setShowClaraChat(false)}
         serviceType={selectedDataCleaningService}
+      />
+    )}
+    {showSallyChat && (
+      <SallyChat 
+        onClose={() => setShowSallyChat(false)}
+        serviceType={selectedSalesService}
+      />
+    )}
+    {showEvaChat && (
+      <EvaChat 
+        onClose={() => setShowEvaChat(false)}
+        serviceType={selectedExecutiveService}
       />
     )}
     </>

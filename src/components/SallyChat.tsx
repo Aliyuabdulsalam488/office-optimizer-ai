@@ -14,9 +14,10 @@ interface Message {
 
 interface SallyChatProps {
   serviceType?: string;
+  onClose: () => void;
 }
 
-const SallyChat = ({ serviceType }: SallyChatProps) => {
+const SallyChat = ({ serviceType, onClose }: SallyChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

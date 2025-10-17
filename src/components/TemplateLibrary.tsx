@@ -213,6 +213,92 @@ const templates: Template[] = [
     icon: FileSpreadsheet,
     category: ["Data Quality Assessment", "General Data Cleaning"],
   },
+  // Sales Templates
+  {
+    name: "Sales Pipeline Dashboard",
+    description: "Track leads and deals through sales stages",
+    icon: FileSpreadsheet,
+    category: ["Pipeline Tracking", "General Sales"],
+  },
+  {
+    name: "Lead Qualification Checklist",
+    description: "Standardized lead scoring and qualification",
+    icon: FileText,
+    category: ["Lead Management", "General Sales"],
+  },
+  {
+    name: "Sales Forecast Template",
+    description: "Project revenue and sales performance",
+    icon: FileSpreadsheet,
+    category: ["Sales Forecasting", "General Sales"],
+  },
+  {
+    name: "CRM Contact Template",
+    description: "Structured customer relationship data",
+    icon: FileText,
+    category: ["CRM Dashboard", "General Sales"],
+  },
+  {
+    name: "Quote Generator Template",
+    description: "Professional sales quotes and proposals",
+    icon: FileText,
+    category: ["Quote Generator", "General Sales"],
+  },
+  {
+    name: "Sales Activity Tracker",
+    description: "Log calls, meetings, and follow-ups",
+    icon: FileSpreadsheet,
+    category: ["Lead Management", "General Sales"],
+  },
+  {
+    name: "Deal Analysis Report",
+    description: "Win/loss analysis and deal metrics",
+    icon: FileSpreadsheet,
+    category: ["Pipeline Tracking", "Sales Forecasting"],
+  },
+  // Executive Templates
+  {
+    name: "Meeting Agenda Template",
+    description: "Structured meeting planning and notes",
+    icon: FileText,
+    category: ["Meeting Scheduler", "General Executive"],
+  },
+  {
+    name: "Travel Itinerary",
+    description: "Comprehensive travel planning document",
+    icon: FileText,
+    category: ["Travel Planning", "General Executive"],
+  },
+  {
+    name: "Expense Report Template",
+    description: "Business expense tracking and submission",
+    icon: FileSpreadsheet,
+    category: ["Expense Tracking", "General Executive"],
+  },
+  {
+    name: "Task Priority Matrix",
+    description: "Eisenhower matrix for task prioritization",
+    icon: FileSpreadsheet,
+    category: ["Task Management", "General Executive"],
+  },
+  {
+    name: "Calendar Planning Template",
+    description: "Weekly and monthly schedule planner",
+    icon: FileSpreadsheet,
+    category: ["Calendar Management", "General Executive"],
+  },
+  {
+    name: "Executive Summary Template",
+    description: "High-level project and business summaries",
+    icon: FileText,
+    category: ["General Executive"],
+  },
+  {
+    name: "Meeting Minutes Template",
+    description: "Record decisions and action items",
+    icon: FileText,
+    category: ["Meeting Scheduler", "General Executive"],
+  },
 ];
 
 interface TemplateLibraryProps {
