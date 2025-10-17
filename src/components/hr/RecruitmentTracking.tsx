@@ -1,232 +1,727 @@
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, Plus, Star, Clock, CheckCircle, XCircle, Mic } from "lucide-react";
-import AIVoiceInterview from "./AIVoiceInterview";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, Briefcase, Users, Calendar, Trash2 } from "lucide-react";
+import { format } from "date-fns";
 
-interface Candidate {
+interface Job {
   id: string;
-  name: string;
-  position: string;
-  stage: "applied" | "screening" | "interview" | "offer" | "hired" | "rejected";
-  rating: number;
-  appliedDate: string;
-  email: string;
-  experience: string;
+  title: string;
+  description: string;
+  department: string;
+  location: string;
+  employment_type: string;
+  salary_range: string;
+  requirements: string;
+  status: string;
+  created_at: string;
 }
 
-const mockCandidates: Candidate[] = [
-  {
-    id: "1",
-    name: "Alex Thompson",
-    position: "Senior Software Engineer",
-    stage: "interview",
-    rating: 4.5,
-    appliedDate: "2025-10-10",
-    email: "alex.t@email.com",
-    experience: "8 years",
-  },
-  {
-    id: "2",
-    name: "Maria Garcia",
-    position: "Product Manager",
-    stage: "offer",
-    rating: 4.8,
-    appliedDate: "2025-10-08",
-    email: "maria.g@email.com",
-    experience: "6 years",
-  },
-  {
-    id: "3",
-    name: "James Lee",
-    position: "UX Designer",
-    stage: "screening",
-    rating: 4.2,
-    appliedDate: "2025-10-12",
-    email: "james.l@email.com",
-    experience: "4 years",
-  },
-];
+interface Application {
+  id: string;
+  job_id: string;
+  candidate_name: string;
+  candidate_email: string;
+  candidate_phone: string;
+  cv_url: string;
+  cover_letter: string;
+  status: string;
+  created_at: string;
+  jobs?: { title: string };
+}
 
-const RecruitmentTracking = () => {
-  const [candidates, setCandidates] = useState<Candidate[]>(mockCandidates);
-  const [showAIInterview, setShowAIInterview] = useState(false);
+interface Interview {
+  id: string;
+  application_id: string;
+  interview_date: string;
+  interview_type: string;
+  interviewer_name: string;
+  location: string;
+  notes: string;
+  status: string;
+  created_at: string;
+  applications?: {
+    candidate_name: string;
+    candidate_email: string;
+    jobs?: { title: string };
+  };
+}
 
-  const getStageColor = (stage: string) => {
-    switch (stage) {
-      case "applied": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "screening": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-      case "interview": return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
-      case "offer": return "bg-green-500/10 text-green-500 border-green-500/20";
-      case "hired": return "bg-green-600/10 text-green-600 border-green-600/20";
-      case "rejected": return "bg-red-500/10 text-red-500 border-red-500/20";
-      default: return "bg-muted";
+interface RecruitmentTrackingProps {
+  view?: 'jobs' | 'applications' | 'interviews';
+}
+
+const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
+  const { toast } = useToast();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [jobForm, setJobForm] = useState({
+    title: '',
+    description: '',
+    department: '',
+    location: '',
+    employment_type: 'full-time',
+    salary_range: '',
+    requirements: '',
+    status: 'open'
+  });
+
+  const [applicationForm, setApplicationForm] = useState({
+    job_id: '',
+    candidate_name: '',
+    candidate_email: '',
+    candidate_phone: '',
+    cover_letter: '',
+    status: 'pending'
+  });
+
+  const [interviewForm, setInterviewForm] = useState({
+    application_id: '',
+    interview_date: '',
+    interview_type: 'video',
+    interviewer_name: '',
+    location: '',
+    notes: '',
+    status: 'scheduled'
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, [view]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to access recruitment features",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (view === 'jobs' || !view) {
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('jobs')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (jobsError) throw jobsError;
+        setJobs(jobsData || []);
+      }
+
+      if (view === 'applications') {
+        const { data: appsData, error: appsError } = await supabase
+          .from('applications')
+          .select('*, jobs(title)')
+          .order('created_at', { ascending: false });
+        
+        if (appsError) throw appsError;
+        setApplications(appsData || []);
+      }
+
+      if (view === 'interviews') {
+        const { data: interviewsData, error: interviewsError } = await supabase
+          .from('interviews')
+          .select('*, applications(candidate_name, candidate_email, jobs(title))')
+          .order('interview_date', { ascending: true });
+        
+        if (interviewsError) throw interviewsError;
+        setInterviews(interviewsData || []);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStageIcon = (stage: string) => {
-    switch (stage) {
-      case "interview": return <Clock className="w-4 h-4" />;
-      case "offer": return <CheckCircle className="w-4 h-4" />;
-      case "hired": return <CheckCircle className="w-4 h-4" />;
-      case "rejected": return <XCircle className="w-4 h-4" />;
-      default: return null;
+  const handleCreateJob = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from('jobs')
+        .insert([{ ...jobForm, user_id: user.id }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Job posting created successfully"
+      });
+      setIsDialogOpen(false);
+      setJobForm({
+        title: '',
+        description: '',
+        department: '',
+        location: '',
+        employment_type: 'full-time',
+        salary_range: '',
+        requirements: '',
+        status: 'open'
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   };
 
-  const stats = {
-    total: candidates.length,
-    interview: candidates.filter(c => c.stage === "interview").length,
-    offer: candidates.filter(c => c.stage === "offer").length,
-    hired: candidates.filter(c => c.stage === "hired").length,
+  const handleCreateApplication = async () => {
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .insert([applicationForm]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Application submitted successfully"
+      });
+      setIsDialogOpen(false);
+      setApplicationForm({
+        job_id: '',
+        candidate_name: '',
+        candidate_email: '',
+        candidate_phone: '',
+        cover_letter: '',
+        status: 'pending'
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
+
+  const handleCreateInterview = async () => {
+    try {
+      const { error } = await supabase
+        .from('interviews')
+        .insert([interviewForm]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Interview scheduled successfully"
+      });
+      setIsDialogOpen(false);
+      setInterviewForm({
+        application_id: '',
+        interview_date: '',
+        interview_type: 'video',
+        interviewer_name: '',
+        location: '',
+        notes: '',
+        status: 'scheduled'
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDelete = async (table: 'jobs' | 'applications' | 'interviews', id: string) => {
+    try {
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Item deleted successfully"
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      open: "default",
+      closed: "secondary",
+      draft: "outline",
+      pending: "outline",
+      reviewing: "secondary",
+      shortlisted: "default",
+      rejected: "destructive",
+      accepted: "default",
+      scheduled: "default",
+      completed: "secondary",
+      cancelled: "destructive",
+      rescheduled: "outline"
+    };
+    const variant = variants[status] as "default" | "secondary" | "destructive" | "outline" | undefined;
+    return <Badge variant={variant || "default"}>{status}</Badge>;
+  };
+
+  if (loading) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
 
   return (
-    <Card className="p-6 bg-gradient-card border-border">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <UserPlus className="w-5 h-5" />
-          <h3 className="text-xl font-bold">Recruitment Tracking</h3>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2 items-center">
+          {view === 'jobs' && <Briefcase className="h-5 w-5" />}
+          {view === 'applications' && <Users className="h-5 w-5" />}
+          {view === 'interviews' && <Calendar className="h-5 w-5" />}
+          <h2 className="text-2xl font-bold">
+            {view === 'jobs' && 'Job Postings'}
+            {view === 'applications' && 'Applications'}
+            {view === 'interviews' && 'Interviews'}
+          </h2>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowAIInterview(true)} variant="outline">
-            <Mic className="w-4 h-4 mr-2" />
-            AI Voice Interview
-          </Button>
-          <Button className="bg-gradient-primary">
-            <Plus className="w-4 h-4 mr-2" />
-            Post New Job
-          </Button>
-        </div>
-      </div>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Create New
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {view === 'jobs' && 'Create Job Posting'}
+                {view === 'applications' && 'Add Application'}
+                {view === 'interviews' && 'Schedule Interview'}
+              </DialogTitle>
+            </DialogHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="p-4 bg-background/50">
-          <p className="text-sm text-muted-foreground mb-1">Active Candidates</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
-        </Card>
-        <Card className="p-4 bg-background/50">
-          <p className="text-sm text-muted-foreground mb-1">In Interview</p>
-          <p className="text-2xl font-bold text-yellow-500">{stats.interview}</p>
-        </Card>
-        <Card className="p-4 bg-background/50">
-          <p className="text-sm text-muted-foreground mb-1">Offers Sent</p>
-          <p className="text-2xl font-bold text-green-500">{stats.offer}</p>
-        </Card>
-        <Card className="p-4 bg-background/50">
-          <p className="text-sm text-muted-foreground mb-1">Hired (This Month)</p>
-          <p className="text-2xl font-bold text-green-600">{stats.hired}</p>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="screening">Screening</TabsTrigger>
-          <TabsTrigger value="interview">Interview</TabsTrigger>
-          <TabsTrigger value="offer">Offer</TabsTrigger>
-          <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="mt-4 space-y-3">
-          {candidates.map((candidate) => (
-            <Card key={candidate.id} className="p-4 bg-background/50 border-border hover:border-primary/50 transition-all">
-              <div className="flex items-start justify-between mb-3">
+            {view === 'jobs' && (
+              <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-1">{candidate.name}</h4>
-                  <p className="text-sm text-muted-foreground">{candidate.position}</p>
+                  <Label>Job Title</Label>
+                  <Input
+                    value={jobForm.title}
+                    onChange={(e) => setJobForm({ ...jobForm, title: e.target.value })}
+                    placeholder="e.g. Senior Software Engineer"
+                  />
                 </div>
-                <Badge className={`${getStageColor(candidate.stage)} flex items-center gap-1`}>
-                  {getStageIcon(candidate.stage)}
-                  {candidate.stage}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                 <div>
-                  <p className="text-xs text-muted-foreground">Rating</p>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-                    <p className="text-sm font-semibold">{candidate.rating}</p>
+                  <Label>Description</Label>
+                  <Textarea
+                    value={jobForm.description}
+                    onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
+                    placeholder="Job description..."
+                    rows={4}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Department</Label>
+                    <Input
+                      value={jobForm.department}
+                      onChange={(e) => setJobForm({ ...jobForm, department: e.target.value })}
+                      placeholder="e.g. Engineering"
+                    />
                   </div>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Experience</p>
-                  <p className="text-sm font-semibold">{candidate.experience}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Applied</p>
-                  <p className="text-sm font-semibold">{candidate.appliedDate}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="text-sm font-semibold truncate">{candidate.email}</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="flex-1">
-                  View Resume
-                </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  Schedule Interview
-                </Button>
-                <Button size="sm" variant="outline">
-                  Move Stage
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="screening">
-          <p className="text-sm text-muted-foreground text-center py-8">
-            {candidates.filter(c => c.stage === "screening").length} candidates in screening
-          </p>
-        </TabsContent>
-
-        <TabsContent value="interview">
-          <p className="text-sm text-muted-foreground text-center py-8">
-            {candidates.filter(c => c.stage === "interview").length} candidates in interview stage
-          </p>
-        </TabsContent>
-
-        <TabsContent value="offer">
-          <p className="text-sm text-muted-foreground text-center py-8">
-            {candidates.filter(c => c.stage === "offer").length} offers pending
-          </p>
-        </TabsContent>
-
-        <TabsContent value="pipeline">
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">Hiring pipeline visualization</p>
-            {["applied", "screening", "interview", "offer", "hired"].map((stage) => {
-              const count = candidates.filter(c => c.stage === stage).length;
-              return (
-                <div key={stage} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="capitalize font-medium">{stage}</span>
-                    <span className="text-muted-foreground">{count} candidates</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="bg-gradient-primary h-2 rounded-full transition-all"
-                      style={{ width: `${(count / candidates.length) * 100}%` }}
+                  <div>
+                    <Label>Location</Label>
+                    <Input
+                      value={jobForm.location}
+                      onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
+                      placeholder="e.g. Remote"
                     />
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </TabsContent>
-      </Tabs>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Employment Type</Label>
+                    <Select
+                      value={jobForm.employment_type}
+                      onValueChange={(value) => setJobForm({ ...jobForm, employment_type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="full-time">Full Time</SelectItem>
+                        <SelectItem value="part-time">Part Time</SelectItem>
+                        <SelectItem value="contract">Contract</SelectItem>
+                        <SelectItem value="internship">Internship</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Salary Range</Label>
+                    <Input
+                      value={jobForm.salary_range}
+                      onChange={(e) => setJobForm({ ...jobForm, salary_range: e.target.value })}
+                      placeholder="e.g. $80k - $120k"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Requirements</Label>
+                  <Textarea
+                    value={jobForm.requirements}
+                    onChange={(e) => setJobForm({ ...jobForm, requirements: e.target.value })}
+                    placeholder="List requirements..."
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select
+                    value={jobForm.status}
+                    onValueChange={(value) => setJobForm({ ...jobForm, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="open">Open</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleCreateJob} className="w-full">Create Job</Button>
+              </div>
+            )}
 
-      {showAIInterview && (
-        <AIVoiceInterview onClose={() => setShowAIInterview(false)} />
+            {view === 'applications' && (
+              <div className="space-y-4">
+                <div>
+                  <Label>Job Position</Label>
+                  <Select
+                    value={applicationForm.job_id}
+                    onValueChange={(value) => setApplicationForm({ ...applicationForm, job_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a job" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobs.filter(j => j.status === 'open').map((job) => (
+                        <SelectItem key={job.id} value={job.id}>{job.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Candidate Name</Label>
+                  <Input
+                    value={applicationForm.candidate_name}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, candidate_name: e.target.value })}
+                    placeholder="Full name"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={applicationForm.candidate_email}
+                      onChange={(e) => setApplicationForm({ ...applicationForm, candidate_email: e.target.value })}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <Input
+                      value={applicationForm.candidate_phone}
+                      onChange={(e) => setApplicationForm({ ...applicationForm, candidate_phone: e.target.value })}
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Cover Letter</Label>
+                  <Textarea
+                    value={applicationForm.cover_letter}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, cover_letter: e.target.value })}
+                    placeholder="Why are you interested in this position?"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select
+                    value={applicationForm.status}
+                    onValueChange={(value) => setApplicationForm({ ...applicationForm, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="reviewing">Reviewing</SelectItem>
+                      <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                      <SelectItem value="accepted">Accepted</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleCreateApplication} className="w-full">Submit Application</Button>
+              </div>
+            )}
+
+            {view === 'interviews' && (
+              <div className="space-y-4">
+                <div>
+                  <Label>Application</Label>
+                  <Select
+                    value={interviewForm.application_id}
+                    onValueChange={(value) => setInterviewForm({ ...interviewForm, application_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an application" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {applications.filter(a => a.status === 'shortlisted').map((app) => (
+                        <SelectItem key={app.id} value={app.id}>
+                          {app.candidate_name} - {app.jobs?.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Interview Date & Time</Label>
+                  <Input
+                    type="datetime-local"
+                    value={interviewForm.interview_date}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, interview_date: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Interview Type</Label>
+                    <Select
+                      value={interviewForm.interview_type}
+                      onValueChange={(value) => setInterviewForm({ ...interviewForm, interview_type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="phone">Phone</SelectItem>
+                        <SelectItem value="video">Video</SelectItem>
+                        <SelectItem value="in-person">In Person</SelectItem>
+                        <SelectItem value="technical">Technical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Interviewer</Label>
+                    <Input
+                      value={interviewForm.interviewer_name}
+                      onChange={(e) => setInterviewForm({ ...interviewForm, interviewer_name: e.target.value })}
+                      placeholder="Interviewer name"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Location / Link</Label>
+                  <Input
+                    value={interviewForm.location}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, location: e.target.value })}
+                    placeholder="Meeting room or video link"
+                  />
+                </div>
+                <div>
+                  <Label>Notes</Label>
+                  <Textarea
+                    value={interviewForm.notes}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, notes: e.target.value })}
+                    placeholder="Additional notes..."
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select
+                    value={interviewForm.status}
+                    onValueChange={(value) => setInterviewForm({ ...interviewForm, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectItem value="rescheduled">Rescheduled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleCreateInterview} className="w-full">Schedule Interview</Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {view === 'jobs' && (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jobs.map((job) => (
+                  <TableRow key={job.id}>
+                    <TableCell className="font-medium">{job.title}</TableCell>
+                    <TableCell>{job.department}</TableCell>
+                    <TableCell>{job.location}</TableCell>
+                    <TableCell>{job.employment_type}</TableCell>
+                    <TableCell>{getStatusBadge(job.status)}</TableCell>
+                    <TableCell>{format(new Date(job.created_at), 'MMM dd, yyyy')}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete('jobs', job.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
-    </Card>
+
+      {view === 'applications' && (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Candidate</TableHead>
+                  <TableHead>Job</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Applied</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {applications.map((app) => (
+                  <TableRow key={app.id}>
+                    <TableCell className="font-medium">{app.candidate_name}</TableCell>
+                    <TableCell>{app.jobs?.title}</TableCell>
+                    <TableCell>{app.candidate_email}</TableCell>
+                    <TableCell>{app.candidate_phone}</TableCell>
+                    <TableCell>{getStatusBadge(app.status)}</TableCell>
+                    <TableCell>{format(new Date(app.created_at), 'MMM dd, yyyy')}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete('applications', app.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {view === 'interviews' && (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Candidate</TableHead>
+                  <TableHead>Job</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Interviewer</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {interviews.map((interview) => (
+                  <TableRow key={interview.id}>
+                    <TableCell className="font-medium">
+                      {interview.applications?.candidate_name}
+                    </TableCell>
+                    <TableCell>{interview.applications?.jobs?.title}</TableCell>
+                    <TableCell>
+                      {format(new Date(interview.interview_date), 'MMM dd, yyyy HH:mm')}
+                    </TableCell>
+                    <TableCell>{interview.interview_type}</TableCell>
+                    <TableCell>{interview.interviewer_name}</TableCell>
+                    <TableCell>{getStatusBadge(interview.status)}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete('interviews', interview.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
 
