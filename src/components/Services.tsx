@@ -31,7 +31,7 @@ const services = [
 
 const Services = () => {
   return (
-    <section className="py-32 px-6 relative">
+    <section id="solutions" className="py-32 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 animate-fade-in">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
