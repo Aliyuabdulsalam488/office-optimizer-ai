@@ -14,6 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          candidate_email: string
+          candidate_name: string
+          candidate_phone: string | null
+          cover_letter: string | null
+          created_at: string
+          cv_url: string | null
+          id: string
+          job_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          candidate_email: string
+          candidate_name: string
+          candidate_phone?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          cv_url?: string | null
+          id?: string
+          job_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          candidate_email?: string
+          candidate_name?: string
+          candidate_phone?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          cv_url?: string | null
+          id?: string
+          job_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interviews: {
+        Row: {
+          application_id: string
+          created_at: string
+          id: string
+          interview_date: string
+          interview_type: string | null
+          interviewer_name: string | null
+          location: string | null
+          notes: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          id?: string
+          interview_date: string
+          interview_type?: string | null
+          interviewer_name?: string | null
+          location?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          id?: string
+          interview_date?: string
+          interview_type?: string | null
+          interviewer_name?: string | null
+          location?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          created_at: string
+          department: string | null
+          description: string | null
+          employment_type: string | null
+          id: string
+          location: string | null
+          requirements: string | null
+          salary_range: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          requirements?: string | null
+          salary_range?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          requirements?: string | null
+          salary_range?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
