@@ -4,8 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FreddyChat from "./FreddyChat";
 import PennyChat from "./PennyChat";
+import HildaChat from "./HildaChat";
 import FinanceServiceSelector from "./FinanceServiceSelector";
 import ProcurementServiceSelector from "./ProcurementServiceSelector";
+import HRServiceSelector from "./HRServiceSelector";
 
 const services = [
   {
@@ -43,10 +45,13 @@ const services = [
 const Services = () => {
   const [showFreddyChat, setShowFreddyChat] = useState(false);
   const [showPennyChat, setShowPennyChat] = useState(false);
+  const [showHildaChat, setShowHildaChat] = useState(false);
   const [showFinanceSelector, setShowFinanceSelector] = useState(false);
   const [showProcurementSelector, setShowProcurementSelector] = useState(false);
+  const [showHRSelector, setShowHRSelector] = useState(false);
   const [selectedFinanceService, setSelectedFinanceService] = useState<string>("");
   const [selectedProcurementService, setSelectedProcurementService] = useState<string>("");
+  const [selectedHRService, setSelectedHRService] = useState<string>("");
 
   return (
     <>
@@ -66,6 +71,7 @@ const Services = () => {
             const Icon = service.icon;
             const isFinance = service.title === "Finance Automation";
             const isProcurement = service.title === "Procurement";
+            const isHR = service.title === "HR Management";
             return (
               <Card
                 key={index}
@@ -97,6 +103,14 @@ const Services = () => {
                     Explore Procurement Services
                   </Button>
                 )}
+                {isHR && (
+                  <Button 
+                    onClick={() => setShowHRSelector(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Explore HR Services
+                  </Button>
+                )}
               </Card>
             );
           })}
@@ -121,6 +135,15 @@ const Services = () => {
         setShowPennyChat(true);
       }}
     />
+    <HRServiceSelector 
+      isOpen={showHRSelector}
+      onClose={() => setShowHRSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedHRService(serviceType);
+        setShowHRSelector(false);
+        setShowHildaChat(true);
+      }}
+    />
     {showFreddyChat && (
       <FreddyChat 
         onClose={() => setShowFreddyChat(false)}
@@ -131,6 +154,12 @@ const Services = () => {
       <PennyChat 
         onClose={() => setShowPennyChat(false)}
         serviceType={selectedProcurementService}
+      />
+    )}
+    {showHildaChat && (
+      <HildaChat 
+        onClose={() => setShowHildaChat(false)}
+        serviceType={selectedHRService}
       />
     )}
     </>

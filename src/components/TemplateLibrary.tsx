@@ -115,6 +115,61 @@ const templates: Template[] = [
     icon: FileSpreadsheet,
     category: ["Logistics & Distribution"],
   },
+  // HR Templates
+  {
+    name: "Employee Onboarding Checklist",
+    description: "Complete new hire onboarding workflow",
+    icon: FileText,
+    category: ["Employee Management", "General HR"],
+  },
+  {
+    name: "Performance Review Template",
+    description: "Structured employee performance evaluation",
+    icon: FileSpreadsheet,
+    category: ["Performance Management", "General HR"],
+  },
+  {
+    name: "Job Description Template",
+    description: "Standardized role and responsibility format",
+    icon: FileText,
+    category: ["Recruitment & Talent", "General HR"],
+  },
+  {
+    name: "Leave Request Form",
+    description: "Time-off and absence request template",
+    icon: FileText,
+    category: ["Leave & Attendance", "General HR"],
+  },
+  {
+    name: "Training Plan Template",
+    description: "Employee development and training schedule",
+    icon: FileSpreadsheet,
+    category: ["Learning & Development"],
+  },
+  {
+    name: "Exit Interview Form",
+    description: "Structured employee departure feedback",
+    icon: FileText,
+    category: ["Employee Management", "General HR"],
+  },
+  {
+    name: "Salary Review Template",
+    description: "Compensation analysis and adjustment framework",
+    icon: FileSpreadsheet,
+    category: ["Performance Management", "General HR"],
+  },
+  {
+    name: "Attendance Tracker",
+    description: "Daily attendance and punctuality monitoring",
+    icon: FileSpreadsheet,
+    category: ["Leave & Attendance"],
+  },
+  {
+    name: "Employee Handbook",
+    description: "Company policies and procedures guide",
+    icon: FileText,
+    category: ["General HR"],
+  },
 ];
 
 interface TemplateLibraryProps {

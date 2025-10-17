@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.penny-chat]
 verify_jwt = false
+
+[functions.hilda-chat]
+verify_jwt = false
