@@ -27,14 +27,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
+      <div className="fixed top-20 right-6 z-[100] flex gap-2">
         {user ? (
-          <Button onClick={() => navigate("/recruitment")}>
+          <Button 
+            onClick={() => navigate("/recruitment")}
+            size="lg"
+            className="shadow-lg"
+          >
             Go to Dashboard
           </Button>
         ) : (
-          <Button onClick={() => navigate("/auth")}>
-            Sign In / Sign Up
+          <Button 
+            onClick={() => navigate("/auth")}
+            size="lg"
+            className="shadow-lg bg-primary hover:bg-primary/90"
+          >
+            🔐 Sign In / Sign Up
           </Button>
         )}
       </div>
