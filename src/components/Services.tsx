@@ -3,7 +3,9 @@ import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp } from 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FreddyChat from "./FreddyChat";
+import PennyChat from "./PennyChat";
 import FinanceServiceSelector from "./FinanceServiceSelector";
+import ProcurementServiceSelector from "./ProcurementServiceSelector";
 
 const services = [
   {
@@ -40,8 +42,11 @@ const services = [
 
 const Services = () => {
   const [showFreddyChat, setShowFreddyChat] = useState(false);
-  const [showServiceSelector, setShowServiceSelector] = useState(false);
-  const [selectedService, setSelectedService] = useState<string>("");
+  const [showPennyChat, setShowPennyChat] = useState(false);
+  const [showFinanceSelector, setShowFinanceSelector] = useState(false);
+  const [showProcurementSelector, setShowProcurementSelector] = useState(false);
+  const [selectedFinanceService, setSelectedFinanceService] = useState<string>("");
+  const [selectedProcurementService, setSelectedProcurementService] = useState<string>("");
 
   return (
     <>
@@ -60,6 +65,7 @@ const Services = () => {
           {services.map((service, index) => {
             const Icon = service.icon;
             const isFinance = service.title === "Finance Automation";
+            const isProcurement = service.title === "Procurement";
             return (
               <Card
                 key={index}
@@ -77,10 +83,18 @@ const Services = () => {
                 </p>
                 {isFinance && (
                   <Button 
-                    onClick={() => setShowServiceSelector(true)}
+                    onClick={() => setShowFinanceSelector(true)}
                     className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
                   >
                     Explore Finance Services
+                  </Button>
+                )}
+                {isProcurement && (
+                  <Button 
+                    onClick={() => setShowProcurementSelector(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Explore Procurement Services
                   </Button>
                 )}
               </Card>
@@ -90,18 +104,33 @@ const Services = () => {
       </div>
     </section>
     <FinanceServiceSelector 
-      isOpen={showServiceSelector}
-      onClose={() => setShowServiceSelector(false)}
+      isOpen={showFinanceSelector}
+      onClose={() => setShowFinanceSelector(false)}
       onSelectService={(serviceType) => {
-        setSelectedService(serviceType);
-        setShowServiceSelector(false);
+        setSelectedFinanceService(serviceType);
+        setShowFinanceSelector(false);
         setShowFreddyChat(true);
+      }}
+    />
+    <ProcurementServiceSelector 
+      isOpen={showProcurementSelector}
+      onClose={() => setShowProcurementSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedProcurementService(serviceType);
+        setShowProcurementSelector(false);
+        setShowPennyChat(true);
       }}
     />
     {showFreddyChat && (
       <FreddyChat 
         onClose={() => setShowFreddyChat(false)}
-        serviceType={selectedService}
+        serviceType={selectedFinanceService}
+      />
+    )}
+    {showPennyChat && (
+      <PennyChat 
+        onClose={() => setShowPennyChat(false)}
+        serviceType={selectedProcurementService}
       />
     )}
     </>

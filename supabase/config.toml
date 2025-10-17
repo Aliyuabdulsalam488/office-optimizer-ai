@@ -2,3 +2,6 @@ project_id = "tkgpmwlnixizolszvbpc"
 
 [functions.freddy-chat]
 verify_jwt = false
+
+[functions.penny-chat]
+verify_jwt = false

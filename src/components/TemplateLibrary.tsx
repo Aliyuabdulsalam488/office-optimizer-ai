@@ -11,6 +11,7 @@ interface Template {
 }
 
 const templates: Template[] = [
+  // Finance Templates
   {
     name: "Cash Flow Statement",
     description: "Track your cash inflows and outflows",
@@ -58,6 +59,61 @@ const templates: Template[] = [
     description: "Track inventory levels and costs",
     icon: FileSpreadsheet,
     category: ["Manufacturing Finance", "General Finance"],
+  },
+  // Procurement Templates
+  {
+    name: "Purchase Order Template",
+    description: "Standardized PO format for supplier orders",
+    icon: FileText,
+    category: ["Manufacturing Procurement", "Retail Procurement", "General Procurement"],
+  },
+  {
+    name: "Supplier Evaluation Matrix",
+    description: "Assess and compare vendor performance",
+    icon: FileSpreadsheet,
+    category: ["Strategic Sourcing", "General Procurement"],
+  },
+  {
+    name: "RFQ Template",
+    description: "Request for Quotation standardized format",
+    icon: FileText,
+    category: ["Manufacturing Procurement", "Strategic Sourcing"],
+  },
+  {
+    name: "Vendor Contract Template",
+    description: "Standard supplier agreement framework",
+    icon: FileText,
+    category: ["Strategic Sourcing", "General Procurement"],
+  },
+  {
+    name: "Procurement Dashboard",
+    description: "Track spending, orders, and supplier metrics",
+    icon: FileSpreadsheet,
+    category: ["Retail Procurement", "Manufacturing Procurement", "General Procurement"],
+  },
+  {
+    name: "Inventory Reorder Calculator",
+    description: "Optimize reorder points and quantities",
+    icon: Calculator,
+    category: ["Manufacturing Procurement", "Retail Procurement"],
+  },
+  {
+    name: "Supplier Onboarding Checklist",
+    description: "Complete vendor setup and compliance checklist",
+    icon: FileText,
+    category: ["Strategic Sourcing", "General Procurement"],
+  },
+  {
+    name: "Cost Comparison Tool",
+    description: "Compare quotes and total cost of ownership",
+    icon: FileSpreadsheet,
+    category: ["Strategic Sourcing", "Indirect Procurement"],
+  },
+  {
+    name: "Logistics Tracking Sheet",
+    description: "Track shipments and delivery performance",
+    icon: FileSpreadsheet,
+    category: ["Logistics & Distribution"],
   },
 ];
 
