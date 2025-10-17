@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import FreddyChat from "./FreddyChat";
 import PennyChat from "./PennyChat";
 import HildaChat from "./HildaChat";
+import ClaraChat from "./ClaraChat";
 import FinanceServiceSelector from "./FinanceServiceSelector";
 import ProcurementServiceSelector from "./ProcurementServiceSelector";
 import HRServiceSelector from "./HRServiceSelector";
+import DataCleaningServiceSelector from "./DataCleaningServiceSelector";
 
 const services = [
   {
@@ -46,12 +48,15 @@ const Services = () => {
   const [showFreddyChat, setShowFreddyChat] = useState(false);
   const [showPennyChat, setShowPennyChat] = useState(false);
   const [showHildaChat, setShowHildaChat] = useState(false);
+  const [showClaraChat, setShowClaraChat] = useState(false);
   const [showFinanceSelector, setShowFinanceSelector] = useState(false);
   const [showProcurementSelector, setShowProcurementSelector] = useState(false);
   const [showHRSelector, setShowHRSelector] = useState(false);
+  const [showDataCleaningSelector, setShowDataCleaningSelector] = useState(false);
   const [selectedFinanceService, setSelectedFinanceService] = useState<string>("");
   const [selectedProcurementService, setSelectedProcurementService] = useState<string>("");
   const [selectedHRService, setSelectedHRService] = useState<string>("");
+  const [selectedDataCleaningService, setSelectedDataCleaningService] = useState<string>("");
 
   return (
     <>
@@ -72,6 +77,7 @@ const Services = () => {
             const isFinance = service.title === "Finance Automation";
             const isProcurement = service.title === "Procurement";
             const isHR = service.title === "HR Management";
+            const isDataCleaning = service.title === "Data Cleaning";
             return (
               <Card
                 key={index}
@@ -111,6 +117,14 @@ const Services = () => {
                     Explore HR Services
                   </Button>
                 )}
+                {isDataCleaning && (
+                  <Button 
+                    onClick={() => setShowDataCleaningSelector(true)}
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    Explore Data Cleaning
+                  </Button>
+                )}
               </Card>
             );
           })}
@@ -144,6 +158,15 @@ const Services = () => {
         setShowHildaChat(true);
       }}
     />
+    <DataCleaningServiceSelector 
+      isOpen={showDataCleaningSelector}
+      onClose={() => setShowDataCleaningSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedDataCleaningService(serviceType);
+        setShowDataCleaningSelector(false);
+        setShowClaraChat(true);
+      }}
+    />
     {showFreddyChat && (
       <FreddyChat 
         onClose={() => setShowFreddyChat(false)}
@@ -160,6 +183,12 @@ const Services = () => {
       <HildaChat 
         onClose={() => setShowHildaChat(false)}
         serviceType={selectedHRService}
+      />
+    )}
+    {showClaraChat && (
+      <ClaraChat 
+        onClose={() => setShowClaraChat(false)}
+        serviceType={selectedDataCleaningService}
       />
     )}
     </>

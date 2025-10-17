@@ -170,6 +170,49 @@ const templates: Template[] = [
     icon: FileText,
     category: ["General HR"],
   },
+  // Data Cleaning Templates
+  {
+    name: "Data Quality Report",
+    description: "Comprehensive data quality assessment template",
+    icon: FileSpreadsheet,
+    category: ["Data Quality Assessment", "General Data Cleaning"],
+  },
+  {
+    name: "Duplicate Detection Log",
+    description: "Track and document duplicate record findings",
+    icon: FileText,
+    category: ["Duplicate Detection", "General Data Cleaning"],
+  },
+  {
+    name: "Data Transformation Rules",
+    description: "Document standardization and transformation logic",
+    icon: FileSpreadsheet,
+    category: ["Data Transformation", "General Data Cleaning"],
+  },
+  {
+    name: "Validation Rules Matrix",
+    description: "Define and track data validation constraints",
+    icon: FileSpreadsheet,
+    category: ["Validation Rules", "General Data Cleaning"],
+  },
+  {
+    name: "Data Profiling Summary",
+    description: "Statistical analysis and field profiling template",
+    icon: FileSpreadsheet,
+    category: ["Data Profiling", "General Data Cleaning"],
+  },
+  {
+    name: "Data Cleaning Checklist",
+    description: "Step-by-step data cleaning workflow guide",
+    icon: FileText,
+    category: ["General Data Cleaning"],
+  },
+  {
+    name: "Missing Value Analysis",
+    description: "Track and handle missing data patterns",
+    icon: FileSpreadsheet,
+    category: ["Data Quality Assessment", "General Data Cleaning"],
+  },
 ];
 
 interface TemplateLibraryProps {
