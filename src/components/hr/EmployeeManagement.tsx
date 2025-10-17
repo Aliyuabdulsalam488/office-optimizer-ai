@@ -2,9 +2,13 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, Search, Plus, Mail, Phone, MapPin, Briefcase } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Employee {
   id: string;
@@ -61,6 +65,17 @@ const mockEmployees: Employee[] = [
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const { toast } = useToast();
+
+  const handleAddEmployee = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({
+      title: "Employee Added",
+      description: "New employee has been successfully added to the system.",
+    });
+    setShowAddDialog(false);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -85,13 +100,14 @@ const EmployeeManagement = () => {
   };
 
   return (
+    <>
     <Card className="p-6 bg-gradient-card border-border">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5" />
           <h3 className="text-xl font-bold">Employee Management</h3>
         </div>
-        <Button className="bg-gradient-primary">
+        <Button className="bg-gradient-primary" onClick={() => setShowAddDialog(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Employee
         </Button>
@@ -203,6 +219,62 @@ const EmployeeManagement = () => {
         </TabsContent>
       </Tabs>
     </Card>
+
+    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Add New Employee</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleAddEmployee} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="position">Position</Label>
+              <Input id="position" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="department">Department</Label>
+              <Select required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Engineering">Engineering</SelectItem>
+                  <SelectItem value="Marketing">Marketing</SelectItem>
+                  <SelectItem value="Sales">Sales</SelectItem>
+                  <SelectItem value="HR">HR</SelectItem>
+                  <SelectItem value="Finance">Finance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input id="phone" type="tel" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input id="location" required />
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-gradient-primary">
+              Add Employee
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 

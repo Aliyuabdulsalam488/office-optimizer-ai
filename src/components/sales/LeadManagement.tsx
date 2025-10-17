@@ -2,9 +2,13 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, Search, Plus, Mail, Phone, Building, Star } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Lead {
   id: string;
@@ -61,6 +65,17 @@ const mockLeads: Lead[] = [
 const LeadManagement = () => {
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const { toast } = useToast();
+
+  const handleAddLead = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({
+      title: "Lead Added",
+      description: "New lead has been successfully added to the pipeline.",
+    });
+    setShowAddDialog(false);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -93,13 +108,14 @@ const LeadManagement = () => {
   };
 
   return (
+    <>
     <Card className="p-6 bg-gradient-card border-border">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5" />
           <h3 className="text-xl font-bold">Lead Management</h3>
         </div>
-        <Button className="bg-gradient-primary">
+        <Button className="bg-gradient-primary" onClick={() => setShowAddDialog(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Lead
         </Button>
@@ -231,6 +247,62 @@ const LeadManagement = () => {
         </TabsContent>
       </Tabs>
     </Card>
+
+    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Add New Lead</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleAddLead} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="lead-name">Contact Name</Label>
+              <Input id="lead-name" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company">Company</Label>
+              <Input id="company" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lead-email">Email</Label>
+              <Input id="lead-email" type="email" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lead-phone">Phone</Label>
+              <Input id="lead-phone" type="tel" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="source">Lead Source</Label>
+              <Select required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Website">Website</SelectItem>
+                  <SelectItem value="Referral">Referral</SelectItem>
+                  <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                  <SelectItem value="Cold Call">Cold Call</SelectItem>
+                  <SelectItem value="Event">Event</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="value">Estimated Value ($)</Label>
+              <Input id="value" type="number" required />
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-gradient-primary">
+              Add Lead
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 };
 
