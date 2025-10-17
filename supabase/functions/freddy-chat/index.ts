@@ -11,14 +11,18 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, serviceType } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Freddy chat request received with", messages.length, "messages");
+    console.log("Freddy chat request received with", messages.length, "messages", serviceType ? `for ${serviceType}` : "");
+
+    const systemPrompt = serviceType 
+      ? `You are Freddy, a smart AI finance assistant specializing in ${serviceType}. You have deep expertise in this specific area of finance. Provide detailed, actionable advice tailored to ${serviceType} needs. Keep your answers clear, professional, and actionable with practical insights specific to this finance domain.`
+      : "You are Freddy, a smart AI finance assistant specializing in business finance automation. You help with invoicing, expense tracking, financial reporting, budgeting, cash flow management, and financial insights. Keep your answers clear, professional, and actionable. Focus on practical advice that business owners can implement immediately.";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -31,7 +35,7 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: "You are Freddy, a smart AI finance assistant specializing in business finance automation. You help with invoicing, expense tracking, financial reporting, budgeting, cash flow management, and financial insights. Keep your answers clear, professional, and actionable. Focus on practical advice that business owners can implement immediately."
+            content: systemPrompt
           },
           ...messages,
         ],

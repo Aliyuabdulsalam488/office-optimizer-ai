@@ -12,13 +12,16 @@ interface Message {
 
 interface FreddyChatProps {
   onClose: () => void;
+  serviceType?: string;
 }
 
-const FreddyChat = ({ onClose }: FreddyChatProps) => {
+const FreddyChat = ({ onClose, serviceType }: FreddyChatProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm Freddy, your AI finance assistant. I can help you with invoicing, expense tracking, financial reports, budgeting, and more. What can I help you with today?"
+      content: serviceType 
+        ? `Hi! I'm Freddy, your AI finance assistant specializing in ${serviceType}. How can I help you today?`
+        : "Hi! I'm Freddy, your AI finance assistant. I can help you with invoicing, expense tracking, financial reports, budgeting, and more. What can I help you with today?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -44,7 +47,10 @@ const FreddyChat = ({ onClose }: FreddyChatProps) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          serviceType: serviceType 
+        }),
       });
 
       if (response.status === 429) {

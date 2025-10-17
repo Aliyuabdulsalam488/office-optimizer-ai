@@ -3,6 +3,7 @@ import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp } from 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FreddyChat from "./FreddyChat";
+import FinanceServiceSelector from "./FinanceServiceSelector";
 
 const services = [
   {
@@ -39,6 +40,8 @@ const services = [
 
 const Services = () => {
   const [showFreddyChat, setShowFreddyChat] = useState(false);
+  const [showServiceSelector, setShowServiceSelector] = useState(false);
+  const [selectedService, setSelectedService] = useState<string>("");
 
   return (
     <>
@@ -74,10 +77,10 @@ const Services = () => {
                 </p>
                 {isFinance && (
                   <Button 
-                    onClick={() => setShowFreddyChat(true)}
+                    onClick={() => setShowServiceSelector(true)}
                     className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
                   >
-                    Chat with Freddy
+                    Explore Finance Services
                   </Button>
                 )}
               </Card>
@@ -86,7 +89,21 @@ const Services = () => {
         </div>
       </div>
     </section>
-    {showFreddyChat && <FreddyChat onClose={() => setShowFreddyChat(false)} />}
+    <FinanceServiceSelector 
+      isOpen={showServiceSelector}
+      onClose={() => setShowServiceSelector(false)}
+      onSelectService={(serviceType) => {
+        setSelectedService(serviceType);
+        setShowServiceSelector(false);
+        setShowFreddyChat(true);
+      }}
+    />
+    {showFreddyChat && (
+      <FreddyChat 
+        onClose={() => setShowFreddyChat(false)}
+        serviceType={selectedService}
+      />
+    )}
     </>
   );
 };
