@@ -26,14 +26,14 @@ const Auth = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/recruitment");
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/");
+        navigate("/recruitment");
       }
     });
 
@@ -51,7 +51,7 @@ const Auth = () => {
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/recruitment`,
           data: {
             full_name: validated.fullName || "",
           },
@@ -124,10 +124,10 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Techstora Hub
+            Recruitment Hub
           </h1>
           <p className="text-muted-foreground mt-2">
-            Welcome back! Please sign in to continue
+            Sign in to manage your recruitment process
           </p>
         </div>
 

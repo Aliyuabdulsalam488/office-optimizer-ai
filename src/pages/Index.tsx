@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
@@ -6,8 +10,34 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        {user ? (
+          <Button onClick={() => navigate("/recruitment")}>
+            Go to Dashboard
+          </Button>
+        ) : (
+          <Button onClick={() => navigate("/auth")}>
+            Sign In / Sign Up
+          </Button>
+        )}
+      </div>
       <Header />
       <Hero />
       <Services />
