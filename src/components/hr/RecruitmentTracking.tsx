@@ -3,7 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, Plus, Star, Clock, CheckCircle, XCircle } from "lucide-react";
+import { UserPlus, Plus, Star, Clock, CheckCircle, XCircle, Mic } from "lucide-react";
+import AIVoiceInterview from "./AIVoiceInterview";
 
 interface Candidate {
   id: string;
@@ -51,6 +52,7 @@ const mockCandidates: Candidate[] = [
 
 const RecruitmentTracking = () => {
   const [candidates, setCandidates] = useState<Candidate[]>(mockCandidates);
+  const [showAIInterview, setShowAIInterview] = useState(false);
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -88,10 +90,16 @@ const RecruitmentTracking = () => {
           <UserPlus className="w-5 h-5" />
           <h3 className="text-xl font-bold">Recruitment Tracking</h3>
         </div>
-        <Button className="bg-gradient-primary">
-          <Plus className="w-4 h-4 mr-2" />
-          Post New Job
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowAIInterview(true)} variant="outline">
+            <Mic className="w-4 h-4 mr-2" />
+            AI Voice Interview
+          </Button>
+          <Button className="bg-gradient-primary">
+            <Plus className="w-4 h-4 mr-2" />
+            Post New Job
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -214,6 +222,10 @@ const RecruitmentTracking = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {showAIInterview && (
+        <AIVoiceInterview onClose={() => setShowAIInterview(false)} />
+      )}
     </Card>
   );
 };

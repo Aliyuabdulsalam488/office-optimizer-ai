@@ -15,5 +15,8 @@ verify_jwt = false
 [functions.sally-chat]
 verify_jwt = false
 
+[functions.ai-interview-token]
+verify_jwt = false
+
 [functions.eva-chat]
 verify_jwt = false
