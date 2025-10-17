@@ -13,6 +13,11 @@ import {
 import DocumentUpload from "./DocumentUpload";
 import TemplateLibrary from "./TemplateLibrary";
 import ERPIntegration from "./ERPIntegration";
+import SupplierManagement from "./procurement/SupplierManagement";
+import PurchaseRequisition from "./procurement/PurchaseRequisition";
+import SpendAnalytics from "./procurement/SpendAnalytics";
+import ContractManagement from "./procurement/ContractManagement";
+import RFQGenerator from "./procurement/RFQGenerator";
 
 const procurementServices = [
   {
@@ -111,12 +116,32 @@ const ProcurementServiceSelector = ({ isOpen, onClose, onSelectService }: Procur
           </div>
         ) : (
           <div className="space-y-6 mt-6">
-            <Tabs defaultValue="documents" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+            <Tabs defaultValue="analytics" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 text-xs">
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+                <TabsTrigger value="requisition">Requisition</TabsTrigger>
+                <TabsTrigger value="contracts">Contracts</TabsTrigger>
+                <TabsTrigger value="rfq">RFQ</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
                 <TabsTrigger value="templates">Templates</TabsTrigger>
-                <TabsTrigger value="erp">ERP Integration</TabsTrigger>
+                <TabsTrigger value="erp">ERP</TabsTrigger>
               </TabsList>
+              <TabsContent value="analytics" className="mt-4">
+                <SpendAnalytics />
+              </TabsContent>
+              <TabsContent value="suppliers" className="mt-4">
+                <SupplierManagement />
+              </TabsContent>
+              <TabsContent value="requisition" className="mt-4">
+                <PurchaseRequisition />
+              </TabsContent>
+              <TabsContent value="contracts" className="mt-4">
+                <ContractManagement />
+              </TabsContent>
+              <TabsContent value="rfq" className="mt-4">
+                <RFQGenerator />
+              </TabsContent>
               <TabsContent value="documents" className="mt-4">
                 <DocumentUpload serviceType={selectedService} />
               </TabsContent>
