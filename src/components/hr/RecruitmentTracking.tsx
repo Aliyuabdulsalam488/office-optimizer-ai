@@ -12,6 +12,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Briefcase, Users, Calendar, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { z } from "zod";
+
+const jobSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  description: z.string().trim().min(1, "Description is required").max(5000, "Description must be less than 5000 characters"),
+  department: z.string().trim().max(100, "Department must be less than 100 characters"),
+  location: z.string().trim().max(200, "Location must be less than 200 characters"),
+  employment_type: z.enum(['full-time', 'part-time', 'contract', 'internship']),
+  salary_range: z.string().trim().max(100, "Salary range must be less than 100 characters"),
+  requirements: z.string().trim().max(2000, "Requirements must be less than 2000 characters"),
+  status: z.enum(['open', 'closed', 'draft'])
+});
+
+const applicationSchema = z.object({
+  job_id: z.string().uuid("Invalid job ID"),
+  candidate_name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  candidate_email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  candidate_phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
+  cover_letter: z.string().trim().max(2000, "Cover letter must be less than 2000 characters"),
+  status: z.enum(['pending', 'reviewing', 'shortlisted', 'rejected', 'accepted'])
+});
+
+const interviewSchema = z.object({
+  application_id: z.string().uuid("Invalid application ID"),
+  interview_date: z.string().min(1, "Interview date is required"),
+  interview_type: z.enum(['video', 'phone', 'in-person']),
+  interviewer_name: z.string().trim().min(1, "Interviewer name is required").max(100, "Interviewer name must be less than 100 characters"),
+  location: z.string().trim().max(200, "Location must be less than 200 characters"),
+  notes: z.string().trim().max(1000, "Notes must be less than 1000 characters"),
+  status: z.enum(['scheduled', 'completed', 'cancelled', 'rescheduled'])
+});
 
 interface Job {
   id: string;
@@ -160,9 +191,11 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
+      const validatedData = jobSchema.parse(jobForm);
+
       const { error } = await supabase
         .from('jobs')
-        .insert([{ ...jobForm, user_id: user.id }]);
+        .insert([{ ...validatedData, user_id: user.id }]);
 
       if (error) throw error;
 
@@ -183,19 +216,29 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const handleCreateApplication = async () => {
     try {
+      const validatedData = applicationSchema.parse(applicationForm);
+
       const { error } = await supabase
         .from('applications')
-        .insert([applicationForm]);
+        .insert([validatedData]);
 
       if (error) throw error;
 
@@ -214,19 +257,29 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const handleCreateInterview = async () => {
     try {
+      const validatedData = interviewSchema.parse(interviewForm);
+
       const { error } = await supabase
         .from('interviews')
-        .insert([interviewForm]);
+        .insert([validatedData]);
 
       if (error) throw error;
 
@@ -246,11 +299,19 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     }
   };
 
