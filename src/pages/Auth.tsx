@@ -183,16 +183,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPassword(true)}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
+                  <Label htmlFor="signin-password">Password</Label>
                   <Input
                     id="signin-password"
                     type="password"
@@ -202,6 +193,15 @@ const Auth = () => {
                     required
                   />
                 </div>
+
+                <Button
+                  type="button"
+                  variant="link"
+                  className="w-full text-primary font-semibold"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Forgot your password? Click here to reset
+                </Button>
 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}
