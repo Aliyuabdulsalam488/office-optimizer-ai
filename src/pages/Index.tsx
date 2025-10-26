@@ -30,7 +30,7 @@ const Index = () => {
       <div className="fixed top-20 right-6 z-[100] flex gap-2">
         {user ? (
           <Button 
-            onClick={() => navigate("/recruitment")}
+            onClick={() => navigate("/dashboard")}
             size="lg"
             className="shadow-lg"
           >
