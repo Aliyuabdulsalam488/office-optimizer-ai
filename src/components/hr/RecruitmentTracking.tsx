@@ -195,7 +195,17 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
 
       const { error } = await supabase
         .from('jobs')
-        .insert([{ ...validatedData, user_id: user.id }]);
+        .insert([{ 
+          title: validatedData.title,
+          description: validatedData.description,
+          department: validatedData.department,
+          location: validatedData.location,
+          employment_type: validatedData.employment_type,
+          salary_range: validatedData.salary_range,
+          requirements: validatedData.requirements,
+          status: validatedData.status,
+          user_id: user.id 
+        }]);
 
       if (error) throw error;
 
@@ -238,7 +248,14 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
 
       const { error } = await supabase
         .from('applications')
-        .insert([validatedData]);
+        .insert([{
+          job_id: validatedData.job_id,
+          candidate_name: validatedData.candidate_name,
+          candidate_email: validatedData.candidate_email,
+          candidate_phone: validatedData.candidate_phone,
+          cover_letter: validatedData.cover_letter,
+          status: validatedData.status
+        }]);
 
       if (error) throw error;
 
@@ -279,7 +296,15 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
 
       const { error } = await supabase
         .from('interviews')
-        .insert([validatedData]);
+        .insert([{
+          application_id: validatedData.application_id,
+          interview_date: validatedData.interview_date,
+          interview_type: validatedData.interview_type,
+          interviewer_name: validatedData.interviewer_name,
+          location: validatedData.location,
+          notes: validatedData.notes,
+          status: validatedData.status
+        }]);
 
       if (error) throw error;
 
