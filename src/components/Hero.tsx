@@ -40,18 +40,18 @@ const Hero = () => {
           </Button>
         </div>
 
-        {/* Stats */}
+        {/* Highlights */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">10x</div>
+            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">AI Orchestration</div>
             <div className="text-muted-foreground mt-2">Faster Processing</div>
           </div>
           <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">80%</div>
-            <div className="text-muted-foreground mt-2">Cost Reduction</div>
+            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">Smart Workflows</div>
+            <div className="text-muted-foreground mt-2">Cost Efficiency</div>
           </div>
           <div className="animate-slide-up" style={{ animationDelay: "0.6s" }}>
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">24/7</div>
+            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">Always On</div>
             <div className="text-muted-foreground mt-2">Automated Operations</div>
           </div>
         </div>

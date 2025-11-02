@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Star, TrendingUp, AlertCircle, CheckCircle, Plus, Search } from "lucide-react";
+import { Users, TrendingUp, AlertCircle, CheckCircle, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Supplier {
@@ -144,11 +144,8 @@ const SupplierManagement = () => {
                   <p className="text-sm font-semibold">{supplier.qualityScore}%</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Rating</p>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-                    <p className="text-sm font-semibold">{supplier.rating}</p>
-                  </div>
+                  <p className="text-xs text-muted-foreground">Performance Index</p>
+                  <p className="text-sm font-semibold">{Math.round((supplier.onTimeDelivery + supplier.qualityScore) / 2)}%</p>
                 </div>
               </div>
 
