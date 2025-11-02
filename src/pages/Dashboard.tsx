@@ -19,13 +19,16 @@ const Dashboard = () => {
         navigate("/auth");
       } else {
         setUser(user);
-        // Fetch user profile
+        // Fetch user profile with proper error handling
         supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('Error fetching profile:', error);
+            }
             setProfile(data);
             setLoading(false);
           });
