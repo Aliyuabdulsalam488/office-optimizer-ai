@@ -42,6 +42,9 @@ const Header = () => {
           <a href="/jobs" onClick={(e) => { e.preventDefault(); navigate("/jobs"); }} className="text-foreground/80 hover:text-primary transition-colors font-medium cursor-pointer">
             Find Jobs
           </a>
+          <a href="/help" onClick={(e) => { e.preventDefault(); navigate("/help"); }} className="text-foreground/80 hover:text-primary transition-colors font-medium cursor-pointer">
+            Help
+          </a>
           <a href="#contact" className="text-foreground/80 hover:text-primary transition-colors font-medium">
             Contact
           </a>

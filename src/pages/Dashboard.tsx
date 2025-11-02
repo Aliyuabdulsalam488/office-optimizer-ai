@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogOut, Users, TrendingUp, ShoppingCart, Briefcase, Database, DollarSign, BarChart3, FileText, Calendar, ClipboardCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -114,6 +115,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <OnboardingTour onComplete={() => {}} />
       {/* Header */}
       <header className="border-b border-border/50 bg-background/95 backdrop-blur-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
