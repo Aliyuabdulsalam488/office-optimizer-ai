@@ -35,11 +35,8 @@ const Hero = () => {
             Get Started
             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <Button size="xl" variant="outlinePrimary" onClick={() => {
-            const contactSection = document.getElementById("contact");
-            contactSection?.scrollIntoView({ behavior: "smooth" });
-          }}>
-            Watch Demo
+          <Button size="xl" variant="outlinePrimary" onClick={() => navigate("/jobs")}>
+            Find Jobs
           </Button>
         </div>
 
