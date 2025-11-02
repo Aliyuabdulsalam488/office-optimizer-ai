@@ -12,12 +12,16 @@ const authSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(6, "Password must be at least 6 characters").max(100),
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100).optional(),
+  accountType: z.enum(['business', 'personal']).optional(),
+  department: z.enum(['hr', 'finance', 'procurement', 'sales', 'executive', 'data_cleaning', 'general']).optional(),
 });
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [accountType, setAccountType] = useState<"business" | "personal">("business");
+  const [department, setDepartment] = useState<"hr" | "finance" | "procurement" | "sales" | "executive" | "data_cleaning" | "general">("general");
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const navigate = useNavigate();
@@ -46,7 +50,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const validated = authSchema.parse({ email, password, fullName });
+      const validated = authSchema.parse({ 
+        email, 
+        password, 
+        fullName,
+        accountType,
+        department 
+      });
       
       const { error } = await supabase.auth.signUp({
         email: validated.email,
@@ -55,6 +65,8 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/recruitment`,
           data: {
             full_name: validated.fullName || "",
+            account_type: validated.accountType,
+            department: validated.department,
           },
         },
       });
@@ -274,6 +286,39 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="account-type">Account Type</Label>
+                <select
+                  id="account-type"
+                  value={accountType}
+                  onChange={(e) => setAccountType(e.target.value as "business" | "personal")}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  required
+                >
+                  <option value="business">Business</option>
+                  <option value="personal">Personal</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="department">Area of Interest</Label>
+                <select
+                  id="department"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value as any)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  required
+                >
+                  <option value="general">General / Exploring</option>
+                  <option value="hr">Human Resources</option>
+                  <option value="finance">Finance & Accounting</option>
+                  <option value="procurement">Procurement</option>
+                  <option value="sales">Sales & Marketing</option>
+                  <option value="executive">Executive Assistant</option>
+                  <option value="data_cleaning">Data Cleaning & Analytics</option>
+                </select>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

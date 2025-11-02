@@ -2,6 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// Extend the Database type to include user metadata
+export type UserMetadata = {
+  full_name?: string;
+  account_type?: 'business' | 'personal';
+  department?: 'hr' | 'finance' | 'procurement' | 'sales' | 'executive' | 'data_cleaning' | 'general';
+};
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
