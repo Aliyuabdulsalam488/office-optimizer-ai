@@ -78,13 +78,13 @@ const Services = () => {
 
   return (
     <>
-      <section id="solutions" className="py-32 px-6 relative">
+      <section id="solutions" className="py-24 md:py-32 px-6 relative">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20 animate-fade-in">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
+        <div className="text-center mb-16 md:mb-20 animate-fade-in">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
             Our AI Solutions
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             Comprehensive automation across every aspect of your business operations
           </p>
         </div>
@@ -117,7 +117,8 @@ const Services = () => {
                 {isBusinessSetup && (
                   <Button 
                     onClick={() => setShowBusinessSetup(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Create Your Business
                   </Button>
@@ -125,7 +126,8 @@ const Services = () => {
                 {isFinance && (
                   <Button 
                     onClick={() => setShowFinanceSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore Finance Services
                   </Button>
@@ -133,7 +135,8 @@ const Services = () => {
                 {isProcurement && (
                   <Button 
                     onClick={() => setShowProcurementSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore Procurement Services
                   </Button>
@@ -141,7 +144,8 @@ const Services = () => {
                 {isHR && (
                   <Button 
                     onClick={() => setShowHRSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore HR Services
                   </Button>
@@ -149,7 +153,8 @@ const Services = () => {
                 {isDataCleaning && (
                   <Button 
                     onClick={() => setShowDataCleaningSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore Data Cleaning
                   </Button>
@@ -157,7 +162,8 @@ const Services = () => {
                 {isSales && (
                   <Button 
                     onClick={() => setShowSalesSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore Sales Services
                   </Button>
@@ -165,7 +171,8 @@ const Services = () => {
                 {isExecutive && (
                   <Button 
                     onClick={() => setShowExecutiveSelector(true)}
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                    variant="gradient"
+                    className="w-full"
                   >
                     Explore Executive Services
                   </Button>

@@ -20,19 +20,19 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 text-center animate-fade-in">
-        <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight">
           AI-Powered Business Automation
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
           Transform your daily operations with intelligent automation. From finance to HR, 
           let AI handle the routine so you can focus on what matters.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="text-lg px-8 py-6 bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow group">
+          <Button size="xl" variant="gradient" className="group">
             Get Started
             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/50 hover:border-primary hover:bg-primary/10">
+          <Button size="xl" variant="outlinePrimary">
             Watch Demo
           </Button>
         </div>

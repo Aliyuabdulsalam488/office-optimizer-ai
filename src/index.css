@@ -41,8 +41,12 @@ All colors MUST be HSL.
 
     --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(190 95% 50%));
     --gradient-card: linear-gradient(135deg, hsl(224 71% 6%), hsl(223 47% 11%));
-    --shadow-glow: 0 0 60px hsl(263 70% 50% / 0.3);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(263 70% 50% / 0.4), 0 4px 24px hsl(0 0% 0% / 0.2);
+    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.2);
+    
+    /* Spacing scale for consistency */
+    --spacing-section: 8rem;
+    --spacing-section-sm: 4rem;
   }
 }
 

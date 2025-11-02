@@ -102,17 +102,17 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
-      <header className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
+      <header className="border-b border-border/50 bg-background/95 backdrop-blur-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Techstora Dashboard
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Welcome back, {user?.email}
             </p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
+          <Button variant="outline" onClick={handleLogout} size="sm">
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
           </Button>
@@ -194,7 +194,8 @@ const Dashboard = () => {
                     </div>
                     <Button 
                       className="w-full mt-4" 
-                      variant="outline"
+                      variant="default"
+                      size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(module.path);
