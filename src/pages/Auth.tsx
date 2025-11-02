@@ -166,10 +166,10 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Recruitment Hub
+            Techstora
           </h1>
           <p className="text-muted-foreground mt-2">
-            Sign in to manage your recruitment process
+            Sign in to access your business automation platform
           </p>
         </div>
 
