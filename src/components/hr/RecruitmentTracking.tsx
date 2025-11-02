@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Briefcase, Users, Calendar, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { z } from "zod";
+import AIRecruitmentPanel from "./AIRecruitmentPanel";
 
 const jobSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
@@ -67,6 +68,9 @@ interface Application {
   cover_letter: string;
   status: string;
   created_at: string;
+  ai_match_score?: number;
+  ai_analysis?: string;
+  ai_analysis_date?: string;
   jobs?: { title: string };
 }
 
@@ -80,6 +84,11 @@ interface Interview {
   notes: string;
   status: string;
   created_at: string;
+  ai_transcript?: string;
+  ai_evaluation?: string;
+  ai_recommendation?: string;
+  ai_score?: number;
+  meeting_link?: string;
   applications?: {
     candidate_name: string;
     candidate_email: string;
@@ -376,11 +385,16 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       scheduled: "default",
       completed: "secondary",
       cancelled: "destructive",
-      rescheduled: "outline"
+      rescheduled: "outline",
+      interview_scheduled: "default",
+      interview_passed: "default",
+      under_review: "secondary"
     };
     const variant = variants[status] as "default" | "secondary" | "destructive" | "outline" | undefined;
-    return <Badge variant={variant || "default"}>{status}</Badge>;
+    return <Badge variant={variant || "default"}>{status.replace(/_/g, ' ')}</Badge>;
   };
+
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
 
   if (loading) {
     return <div className="text-center py-8">Loading...</div>;
@@ -388,6 +402,15 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
 
   return (
     <div className="space-y-6">
+      {/* AI Recruitment Panel */}
+      {view === 'applications' && (
+        <AIRecruitmentPanel 
+          jobId={selectedJob || undefined}
+          applications={applications}
+          onRefresh={fetchData}
+        />
+      )}
+
       <div className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
           {view === 'jobs' && <Briefcase className="h-5 w-5" />}
@@ -682,44 +705,60 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
       </div>
 
       {view === 'jobs' && (
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {jobs.map((job) => (
-                  <TableRow key={job.id}>
-                    <TableCell className="font-medium">{job.title}</TableCell>
-                    <TableCell>{job.department}</TableCell>
-                    <TableCell>{job.location}</TableCell>
-                    <TableCell>{job.employment_type}</TableCell>
-                    <TableCell>{getStatusBadge(job.status)}</TableCell>
-                    <TableCell>{format(new Date(job.created_at), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete('jobs', job.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+        <>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {jobs.map((job) => (
+                    <TableRow 
+                      key={job.id}
+                      className={selectedJob === job.id ? 'bg-muted' : ''}
+                      onClick={() => setSelectedJob(job.id)}
+                    >
+                      <TableCell className="font-medium">{job.title}</TableCell>
+                      <TableCell>{job.department}</TableCell>
+                      <TableCell>{job.location}</TableCell>
+                      <TableCell>{job.employment_type}</TableCell>
+                      <TableCell>{getStatusBadge(job.status)}</TableCell>
+                      <TableCell>{format(new Date(job.created_at), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete('jobs', job.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          {selectedJob && (
+            <AIRecruitmentPanel 
+              jobId={selectedJob}
+              applications={applications.filter(app => app.job_id === selectedJob)}
+              onRefresh={fetchData}
+            />
+          )}
+        </>
       )}
 
       {view === 'applications' && (
@@ -732,6 +771,7 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
                   <TableHead>Job</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
+                  <TableHead>AI Score</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Applied</TableHead>
                   <TableHead>Actions</TableHead>
@@ -744,6 +784,18 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
                     <TableCell>{app.jobs?.title}</TableCell>
                     <TableCell>{app.candidate_email}</TableCell>
                     <TableCell>{app.candidate_phone}</TableCell>
+                    <TableCell>
+                      {app.ai_match_score ? (
+                        <Badge variant={
+                          app.ai_match_score >= 80 ? "default" :
+                          app.ai_match_score >= 60 ? "secondary" : "outline"
+                        }>
+                          {app.ai_match_score}/100
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Not analyzed</span>
+                      )}
+                    </TableCell>
                     <TableCell>{getStatusBadge(app.status)}</TableCell>
                     <TableCell>{format(new Date(app.created_at), 'MMM dd, yyyy')}</TableCell>
                     <TableCell>
@@ -773,7 +825,8 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
                   <TableHead>Job</TableHead>
                   <TableHead>Date & Time</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Interviewer</TableHead>
+                  <TableHead>AI Score</TableHead>
+                  <TableHead>Recommendation</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -789,7 +842,30 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
                       {format(new Date(interview.interview_date), 'MMM dd, yyyy HH:mm')}
                     </TableCell>
                     <TableCell>{interview.interview_type}</TableCell>
-                    <TableCell>{interview.interviewer_name}</TableCell>
+                    <TableCell>
+                      {interview.ai_score ? (
+                        <Badge variant={
+                          interview.ai_score >= 80 ? "default" :
+                          interview.ai_score >= 60 ? "secondary" : "outline"
+                        }>
+                          {interview.ai_score}/100
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Pending</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {interview.ai_recommendation ? (
+                        <Badge variant={
+                          ['STRONG_YES', 'YES'].includes(interview.ai_recommendation) ? "default" :
+                          interview.ai_recommendation === 'MAYBE' ? "secondary" : "destructive"
+                        }>
+                          {interview.ai_recommendation}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>{getStatusBadge(interview.status)}</TableCell>
                     <TableCell>
                       <Button

@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       applications: {
         Row: {
+          ai_analysis: string | null
+          ai_analysis_date: string | null
+          ai_match_score: number | null
           candidate_email: string
           candidate_name: string
           candidate_phone: string | null
@@ -28,6 +31,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_analysis?: string | null
+          ai_analysis_date?: string | null
+          ai_match_score?: number | null
           candidate_email: string
           candidate_name: string
           candidate_phone?: string | null
@@ -40,6 +46,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_analysis?: string | null
+          ai_analysis_date?: string | null
+          ai_match_score?: number | null
           candidate_email?: string
           candidate_name?: string
           candidate_phone?: string | null
@@ -63,6 +72,10 @@ export type Database = {
       }
       interviews: {
         Row: {
+          ai_evaluation: string | null
+          ai_recommendation: string | null
+          ai_score: number | null
+          ai_transcript: string | null
           application_id: string
           created_at: string
           id: string
@@ -70,11 +83,16 @@ export type Database = {
           interview_type: string | null
           interviewer_name: string | null
           location: string | null
+          meeting_link: string | null
           notes: string | null
           status: string | null
           updated_at: string
         }
         Insert: {
+          ai_evaluation?: string | null
+          ai_recommendation?: string | null
+          ai_score?: number | null
+          ai_transcript?: string | null
           application_id: string
           created_at?: string
           id?: string
@@ -82,11 +100,16 @@ export type Database = {
           interview_type?: string | null
           interviewer_name?: string | null
           location?: string | null
+          meeting_link?: string | null
           notes?: string | null
           status?: string | null
           updated_at?: string
         }
         Update: {
+          ai_evaluation?: string | null
+          ai_recommendation?: string | null
+          ai_score?: number | null
+          ai_transcript?: string | null
           application_id?: string
           created_at?: string
           id?: string
@@ -94,6 +117,7 @@ export type Database = {
           interview_type?: string | null
           interviewer_name?: string | null
           location?: string | null
+          meeting_link?: string | null
           notes?: string | null
           status?: string | null
           updated_at?: string

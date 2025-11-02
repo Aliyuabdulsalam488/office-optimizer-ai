@@ -1,1 +1,13 @@
 project_id = "tkgpmwlnixizolszvbpc"
+
+[functions.ai-cv-analyzer]
+verify_jwt = true
+
+[functions.ai-interview-scheduler]
+verify_jwt = true
+
+[functions.ai-interview-evaluator]
+verify_jwt = false
+
+[functions.send-followup-email]
+verify_jwt = true
