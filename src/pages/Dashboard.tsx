@@ -11,6 +11,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -18,7 +19,16 @@ const Dashboard = () => {
         navigate("/auth");
       } else {
         setUser(user);
-        setLoading(false);
+        // Fetch user profile
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => {
+            setProfile(data);
+            setLoading(false);
+          });
       }
     });
 
@@ -109,7 +119,17 @@ const Dashboard = () => {
               Techstora Dashboard
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Welcome back, {user?.email}
+              Welcome back, {profile?.full_name || user?.email}
+              {profile?.account_type && (
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {profile.account_type === 'business' ? '🏢 Business' : '👤 Personal'}
+                </span>
+              )}
+              {profile?.department && profile.department !== 'general' && (
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-secondary/10 text-secondary">
+                  {profile.department.charAt(0).toUpperCase() + profile.department.slice(1).replace('_', ' ')}
+                </span>
+              )}
             </p>
           </div>
           <Button variant="outline" onClick={handleLogout} size="sm">
@@ -121,6 +141,25 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Welcome Message */}
+        {profile && (
+          <div className="mb-8 p-6 rounded-lg bg-gradient-card border border-border">
+            <h2 className="text-2xl font-bold mb-2">
+              Welcome to Techstora! 🎉
+            </h2>
+            <p className="text-muted-foreground">
+              {profile.account_type === 'business' 
+                ? "Let's automate your business operations and boost productivity."
+                : "Discover how AI can simplify your daily tasks and workflows."}
+              {profile.department && profile.department !== 'general' && (
+                <span className="block mt-2">
+                  We've tailored your experience for <strong>{profile.department.replace('_', ' ')}</strong> needs.
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
