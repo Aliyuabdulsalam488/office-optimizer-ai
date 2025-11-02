@@ -1,7 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const CTA = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleContactSales = () => {
+    toast({
+      title: "Contact Sales",
+      description: "Our sales team will reach out to you shortly. Email: sales@techstora.com",
+    });
+  };
+
   return (
     <section id="contact" className="py-24 md:py-32 px-6 relative overflow-hidden">
       {/* Gradient Background */}
@@ -17,11 +29,11 @@ const CTA = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <Button size="xl" variant="gradient" className="group">
+          <Button size="xl" variant="gradient" className="group" onClick={() => navigate("/auth")}>
             Start Free Trial
             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <Button size="xl" variant="outlinePrimary" className="group">
+          <Button size="xl" variant="outlinePrimary" className="group" onClick={handleContactSales}>
             <Mail className="mr-2 group-hover:scale-110 transition-transform" />
             Contact Sales
           </Button>

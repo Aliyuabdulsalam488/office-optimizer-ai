@@ -1,4 +1,9 @@
 const Footer = () => {
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    section?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <footer className="border-t border-border/50 py-12 md:py-16 px-6">
       <div className="max-w-7xl mx-auto">
@@ -16,21 +21,21 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Solutions</h4>
             <ul className="space-y-2 text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">Finance</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Procurement</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">HR Management</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Executive Assistant</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Data Cleaning</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("solutions")}>Finance</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("solutions")}>Procurement</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("solutions")}>HR Management</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("solutions")}>Executive Assistant</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("solutions")}>Data Cleaning</li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-muted-foreground">
-              <li className="hover:text-foreground transition-colors cursor-pointer">About Us</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Careers</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Blog</li>
-              <li className="hover:text-foreground transition-colors cursor-pointer">Contact</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("how-it-works")}>About Us</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("contact")}>Careers</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("how-it-works")}>Blog</li>
+              <li className="hover:text-foreground transition-colors cursor-pointer" onClick={() => scrollToSection("contact")}>Contact</li>
             </ul>
           </div>
         </div>

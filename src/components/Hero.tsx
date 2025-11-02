@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroBackground from "@/assets/hero-background.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -28,11 +31,14 @@ const Hero = () => {
           let AI handle the routine so you can focus on what matters.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="xl" variant="gradient" className="group">
+          <Button size="xl" variant="gradient" className="group" onClick={() => navigate("/auth")}>
             Get Started
             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <Button size="xl" variant="outlinePrimary">
+          <Button size="xl" variant="outlinePrimary" onClick={() => {
+            const contactSection = document.getElementById("contact");
+            contactSection?.scrollIntoView({ behavior: "smooth" });
+          }}>
             Watch Demo
           </Button>
         </div>
