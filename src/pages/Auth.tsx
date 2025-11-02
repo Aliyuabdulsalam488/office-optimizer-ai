@@ -12,12 +12,23 @@ const authSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(6, "Password must be at least 6 characters").max(100),
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100).optional(),
+  agreedToTerms: z.boolean().optional(),
+}).refine((data) => {
+  // Only require terms agreement if fullName is provided (signup flow)
+  if (data.fullName) {
+    return data.agreedToTerms === true;
+  }
+  return true;
+}, {
+  message: "You must agree to the Terms and Conditions",
+  path: ["agreedToTerms"],
 });
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const navigate = useNavigate();
@@ -49,7 +60,8 @@ const Auth = () => {
       const validated = authSchema.parse({ 
         email, 
         password, 
-        fullName
+        fullName,
+        agreedToTerms
       });
       
       const { error } = await supabase.auth.signUp({
@@ -282,7 +294,29 @@ const Auth = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-input"
+                  required
+                />
+                <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+                  I agree to the{" "}
+                  <a 
+                    href="/terms" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Terms and Conditions
+                  </a>
+                </Label>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading || !agreedToTerms}>
                 {loading ? "Creating account..." : "Create Account"}
               </Button>
               
