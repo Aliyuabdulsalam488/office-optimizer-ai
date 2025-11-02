@@ -78,18 +78,18 @@ const Services = () => {
 
   return (
     <>
-      <section id="solutions" className="py-24 md:py-32 px-6 relative">
+      <section id="solutions" className="py-20 px-6 relative">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 md:mb-20 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
-            Our AI Solutions
+        <div className="text-center mb-16 animate-fade-in">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
+            What We Automate
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Comprehensive automation across every aspect of your business operations
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Pick a department and start automating today
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => {
             const Icon = service.icon;
             const isBusinessSetup = service.title === "Business Setup";
@@ -102,81 +102,30 @@ const Services = () => {
             return (
               <Card
                 key={index}
-                className="p-8 bg-gradient-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-glow group animate-slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="p-6 bg-gradient-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg group cursor-pointer"
+                onClick={() => {
+                  if (isBusinessSetup) setShowBusinessSetup(true);
+                  if (isFinance) setShowFinanceSelector(true);
+                  if (isProcurement) setShowProcurementSelector(true);
+                  if (isHR) setShowHRSelector(true);
+                  if (isDataCleaning) setShowDataCleaningSelector(true);
+                  if (isSales) setShowSalesSelector(true);
+                  if (isExecutive) setShowExecutiveSelector(true);
+                }}
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Icon className="w-8 h-8 text-primary-foreground" />
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Icon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                      {service.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {service.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-foreground group-hover:text-transparent group-hover:bg-gradient-primary group-hover:bg-clip-text transition-all">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {service.description}
-                </p>
-                {isBusinessSetup && (
-                  <Button 
-                    onClick={() => setShowBusinessSetup(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Create Your Business
-                  </Button>
-                )}
-                {isFinance && (
-                  <Button 
-                    onClick={() => setShowFinanceSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore Finance Services
-                  </Button>
-                )}
-                {isProcurement && (
-                  <Button 
-                    onClick={() => setShowProcurementSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore Procurement Services
-                  </Button>
-                )}
-                {isHR && (
-                  <Button 
-                    onClick={() => setShowHRSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore HR Services
-                  </Button>
-                )}
-                {isDataCleaning && (
-                  <Button 
-                    onClick={() => setShowDataCleaningSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore Data Cleaning
-                  </Button>
-                )}
-                {isSales && (
-                  <Button 
-                    onClick={() => setShowSalesSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore Sales Services
-                  </Button>
-                )}
-                {isExecutive && (
-                  <Button 
-                    onClick={() => setShowExecutiveSelector(true)}
-                    variant="gradient"
-                    className="w-full"
-                  >
-                    Explore Executive Services
-                  </Button>
-                )}
               </Card>
             );
           })}

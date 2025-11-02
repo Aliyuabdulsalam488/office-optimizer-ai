@@ -3,62 +3,58 @@ import { Bot, Zap, TrendingUp } from "lucide-react";
 const steps = [
   {
     icon: Bot,
-    title: "Connect Your Systems",
-    description: "Seamlessly integrate AI with your existing business tools and workflows.",
+    title: "Sign Up",
+    description: "Create your account in 30 seconds. No credit card required.",
   },
   {
     icon: Zap,
-    title: "Automate Processes",
-    description: "Our AI learns your operations and automates repetitive tasks instantly.",
+    title: "Connect",
+    description: "Link your tools and let AI understand your workflow.",
   },
   {
     icon: TrendingUp,
-    title: "Scale & Optimize",
-    description: "Continuously improve efficiency as AI adapts to your business needs.",
+    title: "Automate",
+    description: "Watch AI handle tasks while you focus on growth.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 md:py-32 px-6 relative overflow-hidden">
+    <section id="how-it-works" className="py-20 px-6 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
       
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16 md:mb-20 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            How It Works
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="text-center mb-12 animate-fade-in">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Get Started in 3 Steps
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Get started in three simple steps and watch your business transform
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            From signup to automation in minutes
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-          {/* Connection Lines */}
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-primary opacity-30 -translate-y-1/2" />
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
               <div
                 key={index}
-                className="relative animate-slide-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className="relative text-center"
               >
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative mb-8">
-                    <div className="w-24 h-24 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow">
-                      <Icon className="w-12 h-12 text-primary-foreground" />
+                <div className="flex flex-col items-center">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center shadow-lg">
+                      <Icon className="w-10 h-10 text-primary-foreground" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground shadow-lg">
+                    <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground shadow-md text-sm">
                       {index + 1}
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">
+                  <h3 className="text-xl font-bold mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed max-w-xs">
+                  <p className="text-sm text-muted-foreground max-w-xs">
                     {step.description}
                   </p>
                 </div>
