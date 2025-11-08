@@ -20,9 +20,10 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="department">Department</Label>
               <Input
                 id="department"
+                maxLength={100}
                 placeholder="e.g., Human Resources"
                 value={data.department || ""}
-                onChange={(e) => onChange("department", e.target.value)}
+                onChange={(e) => onChange("department", e.target.value.trim())}
               />
               {errors?.department && <p className="text-sm text-destructive mt-1">{errors.department}</p>}
             </div>
@@ -31,6 +32,8 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Input
                 id="teamSize"
                 type="number"
+                min="1"
+                max="10000"
                 placeholder="Number of employees you manage"
                 value={data.teamSize || ""}
                 onChange={(e) => onChange("teamSize", e.target.value)}
@@ -47,9 +50,10 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="department">Department</Label>
               <Input
                 id="department"
+                maxLength={100}
                 placeholder="e.g., Finance & Accounting"
                 value={data.department || ""}
-                onChange={(e) => onChange("department", e.target.value)}
+                onChange={(e) => onChange("department", e.target.value.trim())}
               />
             </div>
             <div>
@@ -76,15 +80,19 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="territory">Territory/Region</Label>
               <Input
                 id="territory"
+                maxLength={100}
                 placeholder="e.g., North America, EMEA"
                 value={data.territory || ""}
-                onChange={(e) => onChange("territory", e.target.value)}
+                onChange={(e) => onChange("territory", e.target.value.trim())}
               />
             </div>
             <div>
               <Label htmlFor="targetRevenue">Annual Revenue Target</Label>
               <Input
                 id="targetRevenue"
+                type="number"
+                min="0"
+                max="1000000000"
                 placeholder="e.g., $2M"
                 value={data.targetRevenue || ""}
                 onChange={(e) => onChange("targetRevenue", e.target.value)}
@@ -95,6 +103,8 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Input
                 id="teamSize"
                 type="number"
+                min="1"
+                max="10000"
                 placeholder="Number of sales reps"
                 value={data.teamSize || ""}
                 onChange={(e) => onChange("teamSize", e.target.value)}
@@ -112,6 +122,8 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Input
                 id="projectCount"
                 type="number"
+                min="0"
+                max="1000"
                 placeholder="Number of active projects"
                 value={data.projectCount || ""}
                 onChange={(e) => onChange("projectCount", e.target.value)}
@@ -135,9 +147,37 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="specialty">Specialty/Focus Area</Label>
               <Input
                 id="specialty"
+                maxLength={100}
                 placeholder="e.g., Sustainable design, Modern architecture"
                 value={data.specialty || ""}
-                onChange={(e) => onChange("specialty", e.target.value)}
+                onChange={(e) => onChange("specialty", e.target.value.trim())}
+              />
+            </div>
+          </>
+        );
+
+      case "executive_assistant":
+        return (
+          <>
+            <div>
+              <Label htmlFor="executiveTitle">Executive You Support</Label>
+              <Input
+                id="executiveTitle"
+                maxLength={100}
+                placeholder="e.g., CEO, CFO"
+                value={data.executiveTitle || ""}
+                onChange={(e) => onChange("executiveTitle", e.target.value.trim())}
+              />
+            </div>
+            <div>
+              <Label htmlFor="responsibilities">Key Responsibilities</Label>
+              <Textarea
+                id="responsibilities"
+                maxLength={500}
+                placeholder="e.g., Calendar management, travel planning"
+                value={data.responsibilities || ""}
+                onChange={(e) => onChange("responsibilities", e.target.value.trim())}
+                rows={3}
               />
             </div>
           </>
@@ -150,9 +190,10 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="title">Job Title</Label>
               <Input
                 id="title"
+                maxLength={100}
                 placeholder="e.g., CEO, CFO, COO"
                 value={data.title || ""}
-                onChange={(e) => onChange("title", e.target.value)}
+                onChange={(e) => onChange("title", e.target.value.trim())}
               />
             </div>
             <div>
@@ -180,9 +221,10 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Label htmlFor="department">Department</Label>
               <Input
                 id="department"
+                maxLength={100}
                 placeholder="e.g., Procurement & Supply Chain"
                 value={data.department || ""}
-                onChange={(e) => onChange("department", e.target.value)}
+                onChange={(e) => onChange("department", e.target.value.trim())}
               />
             </div>
             <div>
@@ -190,6 +232,8 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
               <Input
                 id="vendorCount"
                 type="number"
+                min="0"
+                max="10000"
                 placeholder="Number of active vendors"
                 value={data.vendorCount || ""}
                 onChange={(e) => onChange("vendorCount", e.target.value)}
@@ -218,9 +262,10 @@ export const RoleSpecificSignupFields = ({ role, data, onChange, errors }: RoleS
             <Label htmlFor="position">Position/Role (Optional)</Label>
             <Input
               id="position"
+              maxLength={100}
               placeholder="e.g., Software Engineer, Marketing Specialist"
               value={data.position || ""}
-              onChange={(e) => onChange("position", e.target.value)}
+              onChange={(e) => onChange("position", e.target.value.trim())}
             />
           </div>
         );

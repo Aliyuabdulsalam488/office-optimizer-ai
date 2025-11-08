@@ -7,7 +7,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.ai-interview-evaluator]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-followup-email]
 verify_jwt = true

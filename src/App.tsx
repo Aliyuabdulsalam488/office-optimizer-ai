@@ -24,6 +24,7 @@ import FinanceDashboard from "./pages/FinanceDashboard";
 import SalesDashboard from "./pages/SalesDashboard";
 import ExecutiveDashboard from "./pages/ExecutiveDashboard";
 import ProcurementDashboard from "./pages/ProcurementDashboard";
+import ExecutiveAssistantDashboard from "./pages/ExecutiveAssistantDashboard";
 import FeatureSettings from "./pages/FeatureSettings";
 import { RoleBasedNav } from "./components/RoleBasedNav";
 
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/sales-dashboard" element={<SalesDashboard />} />
           <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
           <Route path="/procurement-dashboard" element={<ProcurementDashboard />} />
+          <Route path="/ea-dashboard" element={<ExecutiveAssistantDashboard />} />
           <Route path="/feature-settings" element={<FeatureSettings />} />
           <Route path="/profile-settings" element={<ProfileSettings />} />
           <Route path="/onboarding" element={<Onboarding />} />

@@ -23,13 +23,14 @@ const loginSchema = z.object({
 
 const signupSchema = z
   .object({
-    email: z.string().email("Invalid email address").max(255),
-    // Password is only required when using email & password
-    password: z.string().min(8, "Password must be at least 8 characters").optional(),
+    email: z.string().trim().toLowerCase().email("Invalid email address").max(255),
+    password: z.string().optional(),
     fullName: z
       .string()
+      .trim()
       .min(2, "Name must be at least 2 characters")
-      .max(100),
+      .max(100)
+      .regex(/^[a-zA-Z\s'-]+$/, "Name contains invalid characters"),
     role: z.enum([
       "employee",
       "hr_manager",
@@ -37,7 +38,7 @@ const signupSchema = z
       "procurement_manager",
       "sales_manager",
       "executive",
-      "admin",
+      "executive_assistant",
       "architect",
       "home_builder",
     ]),
@@ -50,6 +51,24 @@ const signupSchema = z
           code: z.ZodIssueCode.custom,
           path: ["password"],
           message: "Password must be at least 8 characters",
+        });
+      } else if (!/[A-Z]/.test(val.password)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["password"],
+          message: "Password must contain at least one uppercase letter",
+        });
+      } else if (!/[a-z]/.test(val.password)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["password"],
+          message: "Password must contain at least one lowercase letter",
+        });
+      } else if (!/[0-9]/.test(val.password)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["password"],
+          message: "Password must contain at least one number",
         });
       }
     }
@@ -135,18 +154,21 @@ const EnhancedAuth = () => {
 
       const role = userRoles?.[0]?.role?.toString();
       
-      // Redirect based on primary role
-      let redirectPath = "/employee-dashboard";
-      if (role === "hr_manager") redirectPath = "/hr-dashboard";
-      else if (role === "architect") redirectPath = "/architect-dashboard";
-      else if (role === "home_builder") redirectPath = "/home-builder-dashboard";
-      else if (role === "finance_manager") redirectPath = "/finance-dashboard";
-      else if (role === "sales_manager") redirectPath = "/sales-dashboard";
-      else if (role === "executive") redirectPath = "/executive-dashboard";
-      else if (role === "procurement_manager") redirectPath = "/procurement-dashboard";
-      else if (role === "admin") redirectPath = "/dashboard";
+      // Role-based routing map
+      const roleRoutes: Record<string, string> = {
+        hr_manager: "/hr-dashboard",
+        finance_manager: "/finance-dashboard",
+        architect: "/architect-dashboard",
+        home_builder: "/home-builder-dashboard",
+        executive: "/executive-dashboard",
+        executive_assistant: "/ea-dashboard",
+        sales_manager: "/sales-dashboard",
+        procurement_manager: "/procurement-dashboard",
+        employee: "/employee-dashboard",
+        admin: "/dashboard",
+      };
       
-      navigate(redirectPath);
+      navigate(roleRoutes[role] || "/employee-dashboard");
 
       toast({
         title: "Welcome back!",
@@ -258,11 +280,11 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
 
         // Store role-specific data if provided
         if (Object.keys(roleSpecificData).length > 0) {
-          await supabase.from("role_specific_data").insert({
+          await supabase.from("role_specific_data").insert([{
             user_id: authData.session.user.id,
-            role: data.role,
+            role: data.role as any,
             data: roleSpecificData,
-          });
+          }]);
         }
       } catch {
         // Non-fatal during sign up
@@ -565,9 +587,9 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="admin" id="admin" />
-                    <Label htmlFor="admin" className="cursor-pointer">
-                      Admin
+                    <RadioGroupItem value="executive_assistant" id="executive_assistant" />
+                    <Label htmlFor="executive_assistant" className="cursor-pointer">
+                      Executive Assistant
                     </Label>
                   </div>
                 </RadioGroup>
