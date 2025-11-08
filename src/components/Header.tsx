@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { AnimatedLogo } from "./AnimatedLogo";
 import { ThemeToggle } from "./ThemeToggle";
+import { CreditSystem } from "./CreditSystem";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center gap-3">
+          {user && <CreditSystem variant="compact" />}
           <ThemeToggle />
           {user ? (
             <>
