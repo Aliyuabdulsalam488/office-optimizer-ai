@@ -10,6 +10,7 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { DataQualityChart } from "@/components/dashboard/DataQualityChart";
 
 const DataCleaningDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -222,6 +223,12 @@ const DataCleaningDashboard = () => {
             delay={500}
           />
         </div>
+      </div>
+
+      {/* Data Quality Visualization */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quality Analysis</h2>
+        <DataQualityChart />
       </div>
     </DashboardLayout>
   );

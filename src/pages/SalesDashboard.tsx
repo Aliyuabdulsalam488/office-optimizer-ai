@@ -9,6 +9,7 @@ import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
+import { SalesPipelineChart } from "@/components/dashboard/SalesPipelineChart";
 
 const SalesDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -219,6 +220,12 @@ const SalesDashboard = () => {
             delay={500}
           />
         </div>
+      </div>
+
+      {/* Sales Analytics */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Sales Analytics</h2>
+        <SalesPipelineChart />
       </div>
     </DashboardLayout>
   );

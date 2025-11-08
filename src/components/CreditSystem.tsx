@@ -8,19 +8,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useCredits } from "@/hooks/use-credits";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface CreditSystemProps {
-  currentCredits?: number;
-  maxCredits?: number;
   variant?: "compact" | "detailed";
 }
 
 export const CreditSystem = ({ 
-  currentCredits = 150, 
-  maxCredits = 500,
   variant = "compact" 
 }: CreditSystemProps) => {
   const [showDetails, setShowDetails] = useState(false);
+  const { credits, loading } = useCredits();
+  
+  if (loading || !credits) {
+    return variant === "compact" ? (
+      <Button variant="outline" className="gap-2" disabled>
+        <Zap className="w-4 h-4" />
+        <LoadingSpinner size="sm" />
+      </Button>
+    ) : null;
+  }
+
+  const { currentCredits, maxCredits, nextRefreshDate } = credits;
   const percentage = (currentCredits / maxCredits) * 100;
   
   const getColorScheme = () => {
@@ -70,7 +80,7 @@ export const CreditSystem = ({
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Refresh Date</span>
-                <span className="font-medium">Nov 30, 2024</span>
+                <span className="font-medium">{new Date(nextRefreshDate).toLocaleDateString()}</span>
               </div>
             </div>
 
@@ -119,11 +129,11 @@ export const CreditSystem = ({
         <div className="grid grid-cols-2 gap-4 pt-3 border-t">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Used This Month</p>
-            <p className="text-lg font-semibold">{maxCredits - currentCredits}</p>
+            <p className="text-lg font-semibold">{credits.totalUsed}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Resets In</p>
-            <p className="text-lg font-semibold">15 days</p>
+            <p className="text-xs text-muted-foreground mb-1">Resets On</p>
+            <p className="text-lg font-semibold">{new Date(nextRefreshDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
           </div>
         </div>
 

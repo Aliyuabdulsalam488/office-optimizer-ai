@@ -8,6 +8,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { HRMetricsChart } from "@/components/dashboard/HRMetricsChart";
 
 const HRDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -190,6 +191,12 @@ const HRDashboard = () => {
             ))}
           </div>
         </AnimatedCard>
+      </div>
+
+      {/* HR Analytics */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">HR Analytics</h2>
+        <HRMetricsChart />
       </div>
     </DashboardLayout>
   );

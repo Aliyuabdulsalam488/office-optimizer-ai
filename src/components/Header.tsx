@@ -6,6 +6,9 @@ import { User } from "@supabase/supabase-js";
 import { AnimatedLogo } from "./AnimatedLogo";
 import { ThemeToggle } from "./ThemeToggle";
 import { CreditSystem } from "./CreditSystem";
+import { NotificationCenter } from "./NotificationCenter";
+import { CommandPalette } from "./CommandPalette";
+import { Kbd } from "@/components/ui/kbd";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -61,7 +64,12 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center gap-3">
-          {user && <CreditSystem variant="compact" />}
+          {user && (
+            <>
+              <NotificationCenter />
+              <CreditSystem variant="compact" />
+            </>
+          )}
           <ThemeToggle />
           {user ? (
             <>
@@ -79,6 +87,7 @@ const Header = () => {
           )}
         </div>
       </div>
+      <CommandPalette />
     </header>
   );
 };

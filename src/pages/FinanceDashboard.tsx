@@ -9,6 +9,7 @@ import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
 
 const FinanceDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -223,6 +224,12 @@ const FinanceDashboard = () => {
             delay={500}
           />
         </div>
+      </div>
+
+      {/* Financial Analytics */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Financial Analytics</h2>
+        <RevenueChart />
       </div>
     </DashboardLayout>
   );
