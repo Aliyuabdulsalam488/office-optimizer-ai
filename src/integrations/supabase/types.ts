@@ -633,6 +633,33 @@ export type Database = {
           },
         ]
       }
+      role_specific_data: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_auth_methods: {
         Row: {
           created_at: string | null
@@ -653,6 +680,33 @@ export type Database = {
           id?: string
           is_primary?: boolean | null
           method?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_feature_modules: {
+        Row: {
+          created_at: string | null
+          enabled: boolean | null
+          enabled_at: string | null
+          id: string
+          module_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          enabled?: boolean | null
+          enabled_at?: string | null
+          id?: string
+          module_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          enabled?: boolean | null
+          enabled_at?: string | null
+          id?: string
+          module_name?: string
           user_id?: string
         }
         Relationships: []

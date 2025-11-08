@@ -20,6 +20,11 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Onboarding from "./pages/Onboarding";
 import ArchitectDashboard from "./pages/ArchitectDashboard";
 import HomeBuilderDashboard from "./pages/HomeBuilderDashboard";
+import FinanceDashboard from "./pages/FinanceDashboard";
+import SalesDashboard from "./pages/SalesDashboard";
+import ExecutiveDashboard from "./pages/ExecutiveDashboard";
+import ProcurementDashboard from "./pages/ProcurementDashboard";
+import FeatureSettings from "./pages/FeatureSettings";
 import { RoleBasedNav } from "./components/RoleBasedNav";
 
 const queryClient = new QueryClient();
@@ -39,6 +44,11 @@ const App = () => (
           <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
           <Route path="/architect-dashboard" element={<ArchitectDashboard />} />
           <Route path="/home-builder-dashboard" element={<HomeBuilderDashboard />} />
+          <Route path="/finance-dashboard" element={<FinanceDashboard />} />
+          <Route path="/sales-dashboard" element={<SalesDashboard />} />
+          <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
+          <Route path="/procurement-dashboard" element={<ProcurementDashboard />} />
+          <Route path="/feature-settings" element={<FeatureSettings />} />
           <Route path="/profile-settings" element={<ProfileSettings />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/recruitment" element={<Recruitment />} />

@@ -10,10 +10,12 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BusinessSetupForm } from "@/components/BusinessSetupForm";
 import { LoadingOverlay } from "@/components/ui/loading-spinner";
+import { RoleSpecificSignupFields } from "@/components/RoleSpecificSignupFields";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -58,6 +60,8 @@ const EnhancedAuth = () => {
   const [loading, setLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"email_link" | "email_password" | "google">("email_password");
   const [showBusinessSetup, setShowBusinessSetup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [roleSpecificData, setRoleSpecificData] = useState<any>({});
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -136,9 +140,11 @@ const EnhancedAuth = () => {
       if (role === "hr_manager") redirectPath = "/hr-dashboard";
       else if (role === "architect") redirectPath = "/architect-dashboard";
       else if (role === "home_builder") redirectPath = "/home-builder-dashboard";
-      else if (["finance_manager", "procurement_manager", "sales_manager", "executive", "admin"].includes(role || "")) {
-        redirectPath = "/dashboard";
-      }
+      else if (role === "finance_manager") redirectPath = "/finance-dashboard";
+      else if (role === "sales_manager") redirectPath = "/sales-dashboard";
+      else if (role === "executive") redirectPath = "/executive-dashboard";
+      else if (role === "procurement_manager") redirectPath = "/procurement-dashboard";
+      else if (role === "admin") redirectPath = "/dashboard";
       
       navigate(redirectPath);
 
@@ -249,6 +255,15 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
             is_primary: true,
           },
         ]);
+
+        // Store role-specific data if provided
+        if (Object.keys(roleSpecificData).length > 0) {
+          await supabase.from("role_specific_data").insert({
+            user_id: authData.session.user.id,
+            role: data.role,
+            data: roleSpecificData,
+          });
+        }
       } catch {
         // Non-fatal during sign up
       }
@@ -426,13 +441,28 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
                   </div>
                   <div>
                     <Label htmlFor="pwd-password">Password</Label>
-                    <Input
-                      id="pwd-password"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="pwd-password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
                     {loading ? (
@@ -574,22 +604,40 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
               {signupForm.watch("loginMethod") === "email_password" && (
                 <div>
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    {...signupForm.register("password")}
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      type={showPassword ? "text" : "password"}
+                      {...signupForm.register("password")}
+                      placeholder="••••••••"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                   {signupForm.formState.errors.password && (
                     <p className="text-sm text-destructive mt-1">
                       {signupForm.formState.errors.password.message}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Minimum 8 characters
-                  </p>
                 </div>
               )}
+
+              <RoleSpecificSignupFields
+                role={signupForm.watch("role")}
+                data={roleSpecificData}
+                onChange={(field, value) => setRoleSpecificData({ ...roleSpecificData, [field]: value })}
+              />
 
               <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
                 {loading ? (

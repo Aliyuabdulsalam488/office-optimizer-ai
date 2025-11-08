@@ -72,9 +72,12 @@ const EmployeeDashboard = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
+            <Button onClick={() => navigate("/feature-settings")} variant="outline">
               <Settings className="w-4 h-4 mr-2" />
-              Settings
+              Feature Settings
+            </Button>
+            <Button onClick={() => navigate("/profile-settings")} variant="outline">
+              Profile
             </Button>
             <Button onClick={handleLogout} variant="ghost">
               <LogOut className="w-4 h-4 mr-2" />
