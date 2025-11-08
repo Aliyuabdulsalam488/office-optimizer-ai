@@ -149,7 +149,7 @@ Identify and categorize any problems with the layout:`;
   } catch (error) {
     console.error('Error in floor-plan-ai function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

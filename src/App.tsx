@@ -12,6 +12,7 @@ import JobSeeker from "./pages/JobSeeker";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import FloorPlanner from "./pages/FloorPlanner";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/jobs" element={<JobSeeker />} />
           <Route path="/floor-planner" element={<FloorPlanner />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/help" element={<Help />} />
           <Route path="/terms" element={<Terms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

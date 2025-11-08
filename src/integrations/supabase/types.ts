@@ -108,6 +108,123 @@ export type Database = {
           },
         ]
       }
+      floor_plan_comments: {
+        Row: {
+          comment: string
+          created_at: string | null
+          floor_plan_id: string
+          id: string
+          position_x: number | null
+          position_y: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string | null
+          floor_plan_id: string
+          id?: string
+          position_x?: number | null
+          position_y?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string | null
+          floor_plan_id?: string
+          id?: string
+          position_x?: number | null
+          position_y?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_comments_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plan_cost_estimates: {
+        Row: {
+          cost_breakdown: Json | null
+          created_at: string | null
+          floor_plan_id: string
+          id: string
+          labor_cost: number | null
+          materials_cost: number | null
+          total_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          cost_breakdown?: Json | null
+          created_at?: string | null
+          floor_plan_id: string
+          id?: string
+          labor_cost?: number | null
+          materials_cost?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          cost_breakdown?: Json | null
+          created_at?: string | null
+          floor_plan_id?: string
+          id?: string
+          labor_cost?: number | null
+          materials_cost?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_cost_estimates_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plan_exports: {
+        Row: {
+          created_at: string | null
+          export_type: string
+          file_url: string | null
+          floor_plan_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          export_type: string
+          file_url?: string | null
+          floor_plan_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          export_type?: string
+          file_url?: string | null
+          floor_plan_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_exports_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       floor_plan_reviews: {
         Row: {
           comments: string | null
@@ -139,6 +256,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "floor_plan_reviews_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plan_shares: {
+        Row: {
+          access_level: string | null
+          created_at: string | null
+          floor_plan_id: string
+          id: string
+          shared_by: string
+          shared_with_email: string
+        }
+        Insert: {
+          access_level?: string | null
+          created_at?: string | null
+          floor_plan_id: string
+          id?: string
+          shared_by: string
+          shared_with_email: string
+        }
+        Update: {
+          access_level?: string | null
+          created_at?: string | null
+          floor_plan_id?: string
+          id?: string
+          shared_by?: string
+          shared_with_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_shares_floor_plan_id_fkey"
             columns: ["floor_plan_id"]
             isOneToOne: false
             referencedRelation: "floor_plans"

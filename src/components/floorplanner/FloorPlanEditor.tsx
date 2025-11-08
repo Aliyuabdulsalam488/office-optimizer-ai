@@ -3,12 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save, Sparkles, CheckCircle } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, CheckCircle, Box, Download, DollarSign, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Canvas as FabricCanvas, Rect, Circle, Line } from "fabric";
 import FloorPlanCanvas from "./FloorPlanCanvas";
 import AISuggestions from "./AISuggestions";
 import FloorChecker from "./FloorChecker";
+import FloorPlan3DViewer from "./FloorPlan3DViewer";
+import ExportPanel from "./ExportPanel";
+import CostEstimator from "./CostEstimator";
+import CollaborationPanel from "./CollaborationPanel";
 
 interface FloorPlanEditorProps {
   planId: string;
@@ -127,8 +131,12 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs defaultValue="editor" className="w-full">
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex-wrap h-auto">
             <TabsTrigger value="editor">Floor Editor</TabsTrigger>
+            <TabsTrigger value="3d-view">
+              <Box className="w-4 h-4 mr-2" />
+              3D View
+            </TabsTrigger>
             <TabsTrigger value="ai-suggestions">
               <Sparkles className="w-4 h-4 mr-2" />
               AI Suggestions
@@ -136,6 +144,18 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
             <TabsTrigger value="checker">
               <CheckCircle className="w-4 h-4 mr-2" />
               Floor Checker
+            </TabsTrigger>
+            <TabsTrigger value="cost">
+              <DollarSign className="w-4 h-4 mr-2" />
+              Cost Estimator
+            </TabsTrigger>
+            <TabsTrigger value="export">
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </TabsTrigger>
+            <TabsTrigger value="collaborate">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Collaborate
             </TabsTrigger>
           </TabsList>
 
@@ -146,12 +166,37 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
             />
           </TabsContent>
 
+          <TabsContent value="3d-view">
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Interactive 3D preview of your floor plan. Use mouse to rotate, zoom, and pan.
+              </p>
+              <FloorPlan3DViewer canvas={canvas} />
+            </div>
+          </TabsContent>
+
           <TabsContent value="ai-suggestions">
             <AISuggestions planId={planId} planData={plan} />
           </TabsContent>
 
           <TabsContent value="checker">
             <FloorChecker planId={planId} canvas={canvas} />
+          </TabsContent>
+
+          <TabsContent value="cost">
+            <CostEstimator planId={planId} canvas={canvas} />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <ExportPanel
+              planId={planId}
+              planTitle={plan?.title || "Floor Plan"}
+              canvas={canvas}
+            />
+          </TabsContent>
+
+          <TabsContent value="collaborate">
+            <CollaborationPanel planId={planId} />
           </TabsContent>
         </Tabs>
       </div>
