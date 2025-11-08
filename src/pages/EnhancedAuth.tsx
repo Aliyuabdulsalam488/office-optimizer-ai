@@ -133,14 +133,25 @@ const EnhancedAuth = () => {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/`,
-        },
+          // Avoid immediate hard redirect so we can handle errors gracefully
+          skipBrowserRedirect: true,
+        } as any,
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
+
+      if (data?.url) {
+        // Safe to redirect now
+        window.location.href = data.url;
+      } else {
+        throw new Error("Google provider did not return a redirect URL");
+      }
     } catch (error: any) {
       const msg = (error?.message || "").toLowerCase();
       const providerDisabled = msg.includes("provider is not enabled") || msg.includes("unsupported provider");
@@ -151,6 +162,7 @@ const EnhancedAuth = () => {
           : (error.message || "An unexpected error occurred"),
         variant: "destructive",
       });
+    } finally {
       setLoading(false);
     }
   };
