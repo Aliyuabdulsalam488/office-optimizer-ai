@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp, Sparkles } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp, Sparkles, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -53,6 +53,11 @@ const services = [
     title: "Sales Automation",
     description: "AI-powered lead generation, pipeline management, and sales forecasting.",
   },
+  {
+    icon: Home,
+    title: "Architecture & Floor Planning",
+    description: "AI-powered floor plan design, 3D visualization, cost estimation, and building code compliance.",
+  },
 ];
 
 const Services = () => {
@@ -102,6 +107,7 @@ const Services = () => {
             const isDataCleaning = service.title === "Data Cleaning";
             const isSales = service.title === "Sales Automation";
             const isExecutive = service.title === "Executive Assistant";
+            const isArchitecture = service.title === "Architecture & Floor Planning";
             return (
               <Card
                 key={index}
@@ -115,6 +121,7 @@ const Services = () => {
                   if (isDataCleaning) setShowDataCleaningSelector(true);
                   if (isSales) setShowSalesSelector(true);
                   if (isExecutive) setShowExecutiveSelector(true);
+                  if (isArchitecture) window.location.href = "/floor-planner";
                 }}
               >
                 <div className="flex items-start gap-4">
