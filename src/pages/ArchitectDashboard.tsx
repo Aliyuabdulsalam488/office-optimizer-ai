@@ -162,9 +162,12 @@ const ArchitectDashboard = () => {
                 Create New Project
               </Button>
               <Button 
-                onClick={() => navigate("/dashboard")} 
                 className="w-full justify-start" 
                 variant="outline"
+                onClick={() => toast({
+                  title: "Work in Progress",
+                  description: "Client management feature coming soon!",
+                })}
               >
                 <Users className="w-4 h-4 mr-2" />
                 Client Management

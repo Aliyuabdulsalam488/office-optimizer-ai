@@ -175,13 +175,20 @@ const EnhancedAuth = () => {
 
       if (error) throw error;
 
-      // Track auth method
+      // Insert user role and auth method
       if (authData.user) {
-        await supabase.from("user_auth_methods").insert({
+        // Insert role into user_roles table
+        await supabase.from("user_roles").insert([{
+          user_id: authData.user.id,
+          role: data.role as any,
+        }]);
+
+        // Track auth method
+        await supabase.from("user_auth_methods").insert([{
           user_id: authData.user.id,
           method: data.loginMethod,
           is_primary: true,
-        });
+        }]);
       }
 
       // Check if business setup is needed based on role

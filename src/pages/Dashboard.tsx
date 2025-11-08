@@ -62,54 +62,62 @@ const Dashboard = () => {
     );
   }
 
+  const handleModuleClick = (path: string) => {
+    toast({
+      title: "Work in Progress",
+      description: "This feature is currently under development. Stay tuned!",
+      variant: "default",
+    });
+  };
+
   const modules = [
     {
       title: "Recruitment",
       description: "Manage job postings, applications, and interviews",
       icon: Users,
-      stats: { total: "24", active: "12", pending: "8" },
       path: "/recruitment",
-      gradient: "from-blue-500/20 to-cyan-500/20"
+      gradient: "from-blue-500/20 to-cyan-500/20",
+      available: true
     },
     {
       title: "Sales Pipeline",
       description: "Track deals, forecasts, and customer relationships",
       icon: TrendingUp,
-      stats: { pipeline: "$2.4M", deals: "45", conversion: "32%" },
       path: "/sales",
-      gradient: "from-green-500/20 to-emerald-500/20"
+      gradient: "from-green-500/20 to-emerald-500/20",
+      available: false
     },
     {
       title: "Finance",
       description: "Financial automation and invoice processing",
       icon: DollarSign,
-      stats: { revenue: "$1.2M", invoices: "89", pending: "12" },
       path: "/finance",
-      gradient: "from-yellow-500/20 to-orange-500/20"
+      gradient: "from-yellow-500/20 to-orange-500/20",
+      available: false
     },
     {
       title: "Procurement",
       description: "Supplier management and purchase orders",
       icon: ShoppingCart,
-      stats: { orders: "156", suppliers: "34", spend: "$890K" },
       path: "/procurement",
-      gradient: "from-purple-500/20 to-pink-500/20"
+      gradient: "from-purple-500/20 to-pink-500/20",
+      available: false
     },
     {
       title: "Executive Assistant",
       description: "Calendar, tasks, expenses, and travel planning",
       icon: Briefcase,
-      stats: { meetings: "18", tasks: "42", expenses: "$5.2K" },
       path: "/executive",
-      gradient: "from-red-500/20 to-rose-500/20"
+      gradient: "from-red-500/20 to-rose-500/20",
+      available: false
     },
     {
       title: "Data Cleaning",
       description: "Data profiling, quality checks, and transformations",
       icon: Database,
-      stats: { datasets: "23", quality: "94%", issues: "8" },
       path: "/data-cleaning",
-      gradient: "from-indigo-500/20 to-violet-500/20"
+      gradient: "from-indigo-500/20 to-violet-500/20",
+      available: false
     }
   ];
 
@@ -172,8 +180,8 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$2.4M</div>
-              <p className="text-xs text-muted-foreground mt-1">+12% from last month</p>
+              <div className="text-2xl font-bold">--</div>
+              <p className="text-xs text-muted-foreground mt-1">Connect data source</p>
             </CardContent>
           </Card>
           <Card>
@@ -181,8 +189,8 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Deals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-muted-foreground mt-1">8 closing this week</p>
+              <div className="text-2xl font-bold">--</div>
+              <p className="text-xs text-muted-foreground mt-1">No active deals</p>
             </CardContent>
           </Card>
           <Card>
@@ -190,8 +198,8 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">Open Positions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground mt-1">24 applications pending</p>
+              <div className="text-2xl font-bold">--</div>
+              <p className="text-xs text-muted-foreground mt-1">No open positions</p>
             </CardContent>
           </Card>
           <Card>
@@ -199,8 +207,8 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">Tasks Due Today</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">8</div>
-              <p className="text-xs text-muted-foreground mt-1">3 high priority</p>
+              <div className="text-2xl font-bold">--</div>
+              <p className="text-xs text-muted-foreground mt-1">No tasks scheduled</p>
             </CardContent>
           </Card>
         </div>
@@ -214,9 +222,16 @@ const Dashboard = () => {
               return (
                 <Card 
                   key={module.path}
-                  className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-none overflow-hidden"
-                  onClick={() => navigate(module.path)}
+                  className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-none overflow-hidden relative"
+                  onClick={() => module.available ? navigate(module.path) : handleModuleClick(module.path)}
                 >
+                  {!module.available && (
+                    <div className="absolute top-3 right-3 z-10">
+                      <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 font-medium">
+                        Coming Soon
+                      </span>
+                    </div>
+                  )}
                   <div className={`absolute inset-0 bg-gradient-to-br ${module.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                   <CardHeader className="relative">
                     <div className="flex items-start justify-between">
@@ -228,24 +243,16 @@ const Dashboard = () => {
                     <CardDescription>{module.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="relative">
-                    <div className="space-y-2">
-                      {Object.entries(module.stats).map(([key, value]) => (
-                        <div key={key} className="flex justify-between text-sm">
-                          <span className="text-muted-foreground capitalize">{key}:</span>
-                          <span className="font-medium">{value}</span>
-                        </div>
-                      ))}
-                    </div>
                     <Button 
-                      className="w-full mt-4" 
-                      variant="default"
+                      className="w-full" 
+                      variant={module.available ? "default" : "outline"}
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(module.path);
+                        module.available ? navigate(module.path) : handleModuleClick(module.path);
                       }}
                     >
-                      View Details
+                      {module.available ? "View Details" : "Coming Soon"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -259,27 +266,9 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
           <Card>
             <CardContent className="pt-6">
-              <div className="space-y-4">
-                {[
-                  { icon: FileText, text: "New application received for Senior Developer", time: "2 hours ago" },
-                  { icon: BarChart3, text: "Deal 'Enterprise Package' moved to negotiation", time: "4 hours ago" },
-                  { icon: Calendar, text: "Meeting scheduled with ABC Corp", time: "5 hours ago" },
-                  { icon: ClipboardCheck, text: "Invoice #1234 approved", time: "1 day ago" },
-                ].map((activity, index) => {
-                  const ActivityIcon = activity.icon;
-                  return (
-                    <div key={index} className="flex items-start gap-3 pb-4 border-b last:border-0 last:pb-0">
-                      <div className="p-2 rounded-lg bg-muted">
-                        <ActivityIcon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{activity.text}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No recent activity. Start by exploring the available modules above.
+              </p>
             </CardContent>
           </Card>
         </div>

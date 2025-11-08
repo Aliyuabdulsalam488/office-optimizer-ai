@@ -138,6 +138,10 @@ const EmployeeDashboard = () => {
               <Button 
                 className="w-full justify-start" 
                 variant="outline"
+                onClick={() => toast({
+                  title: "Work in Progress",
+                  description: "Leave management feature coming soon!",
+                })}
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Request Leave

@@ -156,14 +156,21 @@ const HomeBuilderDashboard = () => {
               <Button 
                 className="w-full justify-start" 
                 variant="outline"
+                onClick={() => toast({
+                  title: "Work in Progress",
+                  description: "Project management feature coming soon!",
+                })}
               >
                 <Hammer className="w-4 h-4 mr-2" />
                 Project Management
               </Button>
               <Button 
-                onClick={() => navigate("/dashboard")} 
                 className="w-full justify-start" 
                 variant="outline"
+                onClick={() => toast({
+                  title: "Work in Progress",
+                  description: "Analytics dashboard coming soon!",
+                })}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View Analytics
