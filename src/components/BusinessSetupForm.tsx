@@ -10,10 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessSetupFormProps {
+  userRole?: string;
   onComplete: () => void;
 }
 
-export const BusinessSetupForm = ({ onComplete }: BusinessSetupFormProps) => {
+export const BusinessSetupForm = ({ userRole, onComplete }: BusinessSetupFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [businessInfo, setBusinessInfo] = useState({
     name: "",

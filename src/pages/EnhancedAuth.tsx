@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import { BusinessSetupForm } from "@/components/BusinessSetupForm";
 import { LoadingOverlay } from "@/components/ui/loading-spinner";
 import { RoleSpecificSignupFields } from "@/components/RoleSpecificSignupFields";
 import { logUserActivity } from "@/utils/activityLogger";
+import { redirectToRoleDashboard, ROLE_ROUTES } from "@/utils/roleRedirect";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -82,8 +83,20 @@ const EnhancedAuth = () => {
   const [showBusinessSetup, setShowBusinessSetup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [roleSpecificData, setRoleSpecificData] = useState<any>({});
+  const [userRole, setUserRole] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check if user is already logged in and redirect
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await redirectToRoleDashboard(session.user.id, navigate);
+      }
+    };
+    checkExistingSession();
+  }, [navigate]);
 
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
@@ -147,29 +160,8 @@ const EnhancedAuth = () => {
 
       if (error) throw error;
 
-      // Get user role to determine redirect
-      const { data: userRoles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id);
-
-      const role = userRoles?.[0]?.role?.toString();
-      
-      // Role-based routing map
-      const roleRoutes: Record<string, string> = {
-        hr_manager: "/hr-dashboard",
-        finance_manager: "/finance-dashboard",
-        architect: "/architect-dashboard",
-        home_builder: "/home-builder-dashboard",
-        executive: "/executive-dashboard",
-        executive_assistant: "/ea-dashboard",
-        sales_manager: "/sales-dashboard",
-        procurement_manager: "/procurement-dashboard",
-        employee: "/employee-dashboard",
-        admin: "/dashboard",
-      };
-      
-      navigate(roleRoutes[role] || "/employee-dashboard");
+      // Redirect to role-based dashboard
+      await redirectToRoleDashboard(data.user.id, navigate);
 
       // Log login activity
       await logUserActivity("login", data.user.id);
@@ -271,16 +263,24 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
 
     if (error) throw error;
 
-    // Call edge function to assign role from metadata
+    // Call edge function to assign role from metadata and wait for it
     if (authData.session?.user) {
       try {
-        await supabase.functions.invoke('assign-user-role', {
+        const roleResponse = await supabase.functions.invoke('assign-user-role', {
           headers: {
             Authorization: `Bearer ${authData.session.access_token}`
           }
         });
+
+        if (roleResponse.error) {
+          console.error('Error assigning role:', roleResponse.error);
+        } else {
+          console.log('Role assigned:', roleResponse.data);
+          // Store the role for later use
+          setUserRole(data.role);
+        }
       } catch (roleError) {
-        console.error('Error assigning role:', roleError);
+        console.error('Error calling assign-user-role:', roleError);
         // Don't block signup if role assignment fails
       }
     }
@@ -319,7 +319,6 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
       "sales_manager",
       "executive",
       "admin",
-      "architect",
       "home_builder",
     ].includes(data.role);
 
@@ -329,6 +328,13 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
         title: "Account created!",
         description: "Let's set up your business information",
       });
+    } else if (authData.session?.user) {
+      // No business setup needed, redirect directly to dashboard
+      toast({
+        title: "Account created!",
+        description: "Redirecting to your dashboard...",
+      });
+      await redirectToRoleDashboard(authData.session.user.id, navigate);
     } else {
       toast({
         title: "Account created!",
@@ -356,13 +362,23 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
               Back to Login
             </Button>
           </div>
-          <BusinessSetupForm onComplete={() => {
-            toast({
-              title: "Setup complete!",
-              description: "Please check your email to verify your account",
-            });
-            setShowBusinessSetup(false);
-          }} />
+          <BusinessSetupForm 
+            userRole={userRole}
+            onComplete={async () => {
+              toast({
+                title: "Setup complete!",
+                description: "Redirecting to your dashboard...",
+              });
+              
+              // Get current user and redirect to dashboard
+              const { data: { session } } = await supabase.auth.getSession();
+              if (session?.user) {
+                await redirectToRoleDashboard(session.user.id, navigate);
+              } else {
+                setShowBusinessSetup(false);
+              }
+            }} 
+          />
         </div>
       </div>
     );
