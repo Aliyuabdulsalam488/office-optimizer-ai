@@ -10,6 +10,15 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { SalesPipelineChart } from "@/components/dashboard/SalesPipelineChart";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const salesModules = [
+  { name: "lead_scoring", displayName: "AI Lead Scoring", description: "Automatically score and prioritize leads", category: "Leads" },
+  { name: "email_automation", displayName: "Email Automation", description: "Automated email campaigns and follow-ups", category: "Automation" },
+  { name: "sales_analytics", displayName: "Sales Analytics", description: "Advanced sales performance analytics", category: "Analytics" },
+  { name: "crm_integration", displayName: "CRM Integration", description: "Connect with popular CRM systems", category: "Integration" },
+  { name: "territory_management", displayName: "Territory Management", description: "Manage sales territories and assignments", category: "Management" },
+];
 
 const SalesDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -226,6 +235,12 @@ const SalesDashboard = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">Sales Analytics</h2>
         <SalesPipelineChart />
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={salesModules} />
       </div>
     </DashboardLayout>
   );

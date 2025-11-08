@@ -9,6 +9,15 @@ import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { HRMetricsChart } from "@/components/dashboard/HRMetricsChart";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const hrModules = [
+  { name: "advanced_recruitment", displayName: "Advanced Recruitment", description: "AI-powered candidate screening and matching", category: "Recruitment" },
+  { name: "performance_analytics", displayName: "Performance Analytics", description: "Detailed performance tracking and insights", category: "Performance" },
+  { name: "payroll_integration", displayName: "Payroll Integration", description: "Seamless payroll processing integration", category: "Payroll" },
+  { name: "learning_management", displayName: "Learning Management", description: "Employee training and development tracking", category: "Development" },
+  { name: "ai_voice_interviews", displayName: "AI Voice Interviews", description: "Automated voice-based candidate interviews", category: "Recruitment" },
+];
 
 const HRDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -197,6 +206,12 @@ const HRDashboard = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">HR Analytics</h2>
         <HRMetricsChart />
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={hrModules} />
       </div>
     </DashboardLayout>
   );

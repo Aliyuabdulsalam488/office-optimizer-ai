@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings, LogOut, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { FeatureModulesPanel } from "@/components/FeatureModulesPanel";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
 
 const FeatureSettings = () => {
   const [user, setUser] = useState<any>(null);
@@ -183,8 +183,12 @@ const FeatureSettings = () => {
                 </CardHeader>
                 <CardContent>
                   <FeatureModulesPanel
-                    availableModules={modules}
-                    userId={user?.id}
+                    roleModules={modules.map(m => ({
+                      name: m.name,
+                      displayName: m.label,
+                      description: m.description,
+                      category: role.replace(/_/g, ' ')
+                    }))}
                   />
                 </CardContent>
               </Card>

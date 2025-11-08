@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DollarSign, ShoppingCart, Users, Calendar, Database, TrendingUp, Sparkles, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import FreddyChat from "./FreddyChat";
 import PennyChat from "./PennyChat";
 import HildaChat from "./HildaChat";
@@ -61,6 +63,8 @@ const services = [
 ];
 
 const Services = () => {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showFreddyChat, setShowFreddyChat] = useState(false);
   const [showPennyChat, setShowPennyChat] = useState(false);
   const [showHildaChat, setShowHildaChat] = useState(false);
@@ -80,6 +84,50 @@ const Services = () => {
   const [selectedDataCleaningService, setSelectedDataCleaningService] = useState<string>("");
   const [selectedSalesService, setSelectedSalesService] = useState<string>("");
   const [selectedExecutiveService, setSelectedExecutiveService] = useState<string>("");
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setIsAuthenticated(!!user);
+  };
+
+  const handleServiceClick = (serviceType: string) => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+
+    // Handle authenticated user service selection
+    switch(serviceType) {
+      case "business-setup":
+        setShowBusinessSetup(true);
+        break;
+      case "finance":
+        setShowFinanceSelector(true);
+        break;
+      case "procurement":
+        setShowProcurementSelector(true);
+        break;
+      case "hr":
+        setShowHRSelector(true);
+        break;
+      case "data-cleaning":
+        setShowDataCleaningSelector(true);
+        break;
+      case "sales":
+        setShowSalesSelector(true);
+        break;
+      case "executive":
+        setShowExecutiveSelector(true);
+        break;
+      case "architecture":
+        navigate("/floor-planner");
+        break;
+    }
+  };
 
   return (
     <>
@@ -114,14 +162,14 @@ const Services = () => {
                 className="p-6 bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2 group cursor-pointer animate-scale-in-bounce"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => {
-                  if (isBusinessSetup) setShowBusinessSetup(true);
-                  if (isFinance) setShowFinanceSelector(true);
-                  if (isProcurement) setShowProcurementSelector(true);
-                  if (isHR) setShowHRSelector(true);
-                  if (isDataCleaning) setShowDataCleaningSelector(true);
-                  if (isSales) setShowSalesSelector(true);
-                  if (isExecutive) setShowExecutiveSelector(true);
-                  if (isArchitecture) window.location.href = "/floor-planner";
+                  if (isBusinessSetup) handleServiceClick("business-setup");
+                  if (isFinance) handleServiceClick("finance");
+                  if (isProcurement) handleServiceClick("procurement");
+                  if (isHR) handleServiceClick("hr");
+                  if (isDataCleaning) handleServiceClick("data-cleaning");
+                  if (isSales) handleServiceClick("sales");
+                  if (isExecutive) handleServiceClick("executive");
+                  if (isArchitecture) handleServiceClick("architecture");
                 }}
               >
                 <div className="flex items-start gap-4">

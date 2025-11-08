@@ -109,8 +109,29 @@ const Onboarding = () => {
       description: "Your account setup is complete",
     });
 
-    const redirectPath = profile?.role === "hr_manager" ? "/hr-dashboard" : "/employee-dashboard";
-    navigate(redirectPath);
+    // Get user role to determine redirect
+    const { data: userRoles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    const role = userRoles?.[0]?.role?.toString();
+    
+    // Role-based routing map
+    const roleRoutes: Record<string, string> = {
+      hr_manager: "/hr-dashboard",
+      finance_manager: "/finance-dashboard",
+      architect: "/architect-dashboard",
+      home_builder: "/home-builder-dashboard",
+      executive: "/executive-dashboard",
+      executive_assistant: "/ea-dashboard",
+      sales_manager: "/sales-dashboard",
+      procurement_manager: "/procurement-dashboard",
+      employee: "/employee-dashboard",
+      admin: "/dashboard",
+    };
+    
+    navigate(roleRoutes[role] || "/employee-dashboard");
   };
 
   const progress = ((currentStep + 1) / optionalSteps.length) * 100;

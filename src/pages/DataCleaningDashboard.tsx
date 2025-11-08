@@ -11,6 +11,15 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { DataQualityChart } from "@/components/dashboard/DataQualityChart";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const dataCleaningModules = [
+  { name: "ai_data_profiling", displayName: "AI Data Profiling", description: "Automatic data quality assessment and profiling", category: "Analysis" },
+  { name: "duplicate_detection", displayName: "Duplicate Detection", description: "Identify and merge duplicate records", category: "Cleaning" },
+  { name: "data_validation", displayName: "Data Validation", description: "Custom validation rules and quality checks", category: "Quality" },
+  { name: "data_transformation", displayName: "Data Transformation", description: "Transform and standardize data formats", category: "Processing" },
+  { name: "automated_reporting", displayName: "Automated Reporting", description: "Scheduled data quality reports", category: "Reporting" },
+];
 
 const DataCleaningDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -229,6 +238,12 @@ const DataCleaningDashboard = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">Quality Analysis</h2>
         <DataQualityChart />
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={dataCleaningModules} />
       </div>
     </DashboardLayout>
   );

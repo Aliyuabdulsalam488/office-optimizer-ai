@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, CheckSquare, Mail, Settings, LogOut, Briefcase, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { FeatureModulesPanel } from "@/components/FeatureModulesPanel";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
 
 const ExecutiveAssistantDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -190,8 +190,12 @@ const ExecutiveAssistantDashboard = () => {
           </Card>
 
           <FeatureModulesPanel 
-            availableModules={availableModules}
-            userId={user?.id}
+            roleModules={availableModules.map(m => ({
+              name: m.name,
+              displayName: m.label,
+              description: m.description,
+              category: "Executive Support"
+            }))}
           />
         </div>
 

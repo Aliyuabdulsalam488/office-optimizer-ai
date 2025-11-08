@@ -10,6 +10,15 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { triggerSuccessConfetti } from "@/utils/confetti";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const employeeModules = [
+  { name: "personal_development", displayName: "Personal Development", description: "Track your learning and career growth", category: "Development" },
+  { name: "wellness_programs", displayName: "Wellness Programs", description: "Access health and wellness resources", category: "Wellness" },
+  { name: "time_tracking", displayName: "Time Tracking", description: "Log work hours and attendance", category: "Productivity" },
+  { name: "collaboration_tools", displayName: "Collaboration Tools", description: "Enhanced team communication features", category: "Collaboration" },
+  { name: "recognition_rewards", displayName: "Recognition & Rewards", description: "Earn badges and rewards for achievements", category: "Engagement" },
+];
 
 const EmployeeDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -195,6 +204,12 @@ const EmployeeDashboard = () => {
             delay={500}
           />
         </div>
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={employeeModules} />
       </div>
     </DashboardLayout>
   );

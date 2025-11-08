@@ -10,6 +10,15 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const financeModules = [
+  { name: "advanced_reporting", displayName: "Advanced Reporting", description: "Generate detailed financial reports and analytics", category: "Reporting" },
+  { name: "budget_forecasting", displayName: "Budget Forecasting", description: "AI-powered budget predictions and planning", category: "Planning" },
+  { name: "invoice_automation", displayName: "Invoice Automation", description: "Automated invoice generation and sending", category: "Automation" },
+  { name: "expense_management", displayName: "Expense Management", description: "Track and manage business expenses", category: "Management" },
+  { name: "tax_compliance", displayName: "Tax Compliance", description: "Automated tax calculations and filing assistance", category: "Compliance" },
+];
 
 const FinanceDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -230,6 +239,12 @@ const FinanceDashboard = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">Financial Analytics</h2>
         <RevenueChart />
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={financeModules} />
       </div>
     </DashboardLayout>
   );

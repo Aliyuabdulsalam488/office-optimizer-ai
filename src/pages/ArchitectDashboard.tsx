@@ -10,6 +10,15 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+
+const architectModules = [
+  { name: "ai_floor_planner", displayName: "AI Floor Planning", description: "AI-assisted floor plan design and optimization", category: "Design" },
+  { name: "code_compliance", displayName: "Code Compliance Checker", description: "Automated building code validation", category: "Compliance" },
+  { name: "cost_estimator", displayName: "Cost Estimator", description: "Detailed project cost calculations", category: "Finance" },
+  { name: "3d_visualization", displayName: "3D Visualization", description: "Advanced 3D rendering and walkthroughs", category: "Visualization" },
+  { name: "collaboration_tools", displayName: "Collaboration Tools", description: "Real-time team collaboration features", category: "Collaboration" },
+];
 
 const ArchitectDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -292,6 +301,12 @@ const ArchitectDashboard = () => {
             ))}
           </div>
         </AnimatedCard>
+      </div>
+
+      {/* Feature Modules */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
+        <FeatureModulesPanel roleModules={architectModules} />
       </div>
     </DashboardLayout>
   );
