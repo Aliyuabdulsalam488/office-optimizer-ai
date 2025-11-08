@@ -9,6 +9,7 @@ import { CreditSystem } from "./CreditSystem";
 import { NotificationCenter } from "./NotificationCenter";
 import { CommandPalette } from "./CommandPalette";
 import { Kbd } from "@/components/ui/kbd";
+import { logUserActivity } from "@/utils/activityLogger";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ const Header = () => {
   }, []);
 
   const handleSignOut = async () => {
+    if (user) {
+      await logUserActivity("logout", user.id);
+    }
     await supabase.auth.signOut();
     navigate("/auth");
   };

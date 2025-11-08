@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BusinessSetupForm } from "@/components/BusinessSetupForm";
 import { LoadingOverlay } from "@/components/ui/loading-spinner";
 import { RoleSpecificSignupFields } from "@/components/RoleSpecificSignupFields";
+import { logUserActivity } from "@/utils/activityLogger";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -169,6 +170,9 @@ const EnhancedAuth = () => {
       };
       
       navigate(roleRoutes[role] || "/employee-dashboard");
+
+      // Log login activity
+      await logUserActivity("login", data.user.id);
 
       toast({
         title: "Welcome back!",

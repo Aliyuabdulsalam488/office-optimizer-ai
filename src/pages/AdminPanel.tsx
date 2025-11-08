@@ -12,6 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
+import { UserActivityTracker } from "@/components/admin/UserActivityTracker";
+import { logAuditEvent } from "@/utils/activityLogger";
 import {
   Table,
   TableBody,
@@ -366,6 +370,15 @@ const AdminPanel = () => {
         description: `Role upgrade request has been ${action === "approve" ? "approved" : "rejected"}`,
       });
 
+      // Log audit event
+      await logAuditEvent(
+        action === "approve" ? "role_request_approved" : "role_request_rejected",
+        "role_upgrade_request",
+        requestId,
+        { requested_role: request.requested_role, action },
+        { user_id: request.user_id }
+      );
+
       await loadRoleRequests();
       await loadUsers();
     } catch (error: any) {
@@ -423,6 +436,15 @@ const AdminPanel = () => {
         description: `Updated roles for ${selectedUser.email}`,
       });
 
+      // Log audit event
+      await logAuditEvent(
+        "roles_updated",
+        "user",
+        selectedUser.id,
+        { added: rolesToAdd, removed: rolesToRemove },
+        { user_email: selectedUser.email }
+      );
+
       setShowRoleDialog(false);
       await loadUsers();
     } catch (error: any) {
@@ -450,6 +472,14 @@ const AdminPanel = () => {
       subtitle="Manage users and their roles"
       icon={<Shield className="w-8 h-8 text-primary" />}
     >
+      <Tabs defaultValue="users" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="users">Users & Roles</TabsTrigger>
+          <TabsTrigger value="activity">User Activity</TabsTrigger>
+          <TabsTrigger value="audit">Audit Log</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-6">
       {/* Search and Actions */}
       <div className="mb-6 flex gap-4">
         <div className="flex-1 relative">
@@ -685,6 +715,16 @@ const AdminPanel = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <UserActivityTracker />
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <AuditLogViewer />
+        </TabsContent>
+      </Tabs>
     </DashboardLayout>
   );
 };

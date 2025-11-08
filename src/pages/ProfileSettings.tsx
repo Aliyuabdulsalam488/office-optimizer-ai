@@ -9,6 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Save, Shield, Bell, Moon, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { EmailVerificationStatus } from "@/components/EmailVerificationStatus";
 
 const ProfileSettings = () => {
   const [user, setUser] = useState<any>(null);
@@ -117,6 +120,9 @@ const ProfileSettings = () => {
         </p>
 
         <div className="space-y-6">
+          {/* Email Verification Status */}
+          <EmailVerificationStatus />
+
           {/* Basic Info */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
