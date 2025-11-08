@@ -1,5 +1,8 @@
 project_id = "tkgpmwlnixizolszvbpc"
 
+[functions.assign-user-role]
+verify_jwt = true
+
 [functions.ai-cv-analyzer]
 verify_jwt = true
 

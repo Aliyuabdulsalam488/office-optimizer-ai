@@ -271,6 +271,20 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
 
     if (error) throw error;
 
+    // Call edge function to assign role from metadata
+    if (authData.session?.user) {
+      try {
+        await supabase.functions.invoke('assign-user-role', {
+          headers: {
+            Authorization: `Bearer ${authData.session.access_token}`
+          }
+        });
+      } catch (roleError) {
+        console.error('Error assigning role:', roleError);
+        // Don't block signup if role assignment fails
+      }
+    }
+
     // Only attempt DB writes if we have an authenticated session (auto-confirm enabled)
     if (authData.session?.user) {
       try {
