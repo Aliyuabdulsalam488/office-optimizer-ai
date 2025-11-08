@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, DollarSign, Settings, LogOut, Target, BarChart3, Phone } from "lucide-react";
+import { TrendingUp, Target, Users, DollarSign, Calendar, Mail, Phone, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { FeatureModulesPanel } from "@/components/FeatureModulesPanel";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Progress } from "@/components/ui/progress";
 
 const SalesDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -63,150 +66,161 @@ const SalesDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
-  const availableModules = [
-    { name: "crm_integration", label: "CRM Integration", description: "Connect with Salesforce, HubSpot, or Pipedrive" },
-    { name: "lead_scoring", label: "AI Lead Scoring", description: "Automatically score and prioritize leads" },
-    { name: "sales_forecasting", label: "Sales Forecasting", description: "Predict future revenue with AI" },
-    { name: "territory_management", label: "Territory Management", description: "Manage and optimize sales territories" },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-primary" />
-              Sales Manager Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome back, {profile?.full_name || user?.email}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+    <DashboardLayout
+      title="Sales Manager Dashboard"
+      subtitle={`Welcome back, ${profile?.full_name || user?.email}`}
+      icon={<TrendingUp className="w-8 h-8 text-primary" />}
+    >
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard
+          title="Monthly Revenue"
+          value="$542,890"
+          icon={DollarSign}
+          trend={{ value: "23% from last month", isPositive: true }}
+          colorScheme="success"
+        />
+        <StatCard
+          title="Active Leads"
+          value={156}
+          icon={Users}
+          trend={{ value: "34 new this week", isPositive: true }}
+          colorScheme="primary"
+        />
+        <StatCard
+          title="Conversion Rate"
+          value="24.5%"
+          icon={Target}
+          trend={{ value: "3.2% increase", isPositive: true }}
+          colorScheme="info"
+        />
+        <StatCard
+          title="Deals Closed"
+          value={42}
+          icon={Award}
+          trend={{ value: "This month", isPositive: true }}
+          colorScheme="warning"
+        />
+      </div>
+
+      {/* Sales Pipeline */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Sales Pipeline</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <AnimatedCard className="p-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" />
+              Pipeline Progress
+            </h3>
+            <div className="space-y-4">
+              {[
+                { stage: "Prospecting", count: 45, value: "$230,000", progress: 30 },
+                { stage: "Qualification", count: 32, value: "$180,000", progress: 50 },
+                { stage: "Proposal", count: 18, value: "$120,000", progress: 70 },
+                { stage: "Negotiation", count: 12, value: "$85,000", progress: 85 },
+              ].map((item, index) => (
+                <div key={index}>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">{item.stage}</span>
+                    <span className="text-muted-foreground">{item.count} deals • {item.value}</span>
+                  </div>
+                  <Progress value={item.progress} className="h-2" />
+                </div>
+              ))}
+            </div>
+          </AnimatedCard>
+
+          <AnimatedCard className="p-6" delay={100}>
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Upcoming Meetings
+            </h3>
+            <div className="space-y-3">
+              {[
+                { client: "Acme Corporation", time: "Today, 2:00 PM", type: "Demo" },
+                { client: "Tech Innovations Inc", time: "Tomorrow, 10:30 AM", type: "Proposal" },
+                { client: "Global Solutions", time: "Nov 10, 3:00 PM", type: "Follow-up" },
+                { client: "Future Systems", time: "Nov 12, 11:00 AM", type: "Negotiation" },
+              ].map((meeting, index) => (
+                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium">{meeting.client}</p>
+                    <p className="text-xs text-muted-foreground">{meeting.time}</p>
+                  </div>
+                  <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary">
+                    {meeting.type}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </AnimatedCard>
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Pipeline Value
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$--</div>
-              <p className="text-xs text-muted-foreground mt-1">Total opportunities</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Active Leads
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Being worked</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Win Rate
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--%</div>
-              <p className="text-xs text-muted-foreground mt-1">This quarter</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Conversion Rate
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--%</div>
-              <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-3">
-              <Button variant="outline" className="justify-start">
-                <Users className="w-4 h-4 mr-2" />
-                Manage Leads
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                View Pipeline
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Phone className="w-4 h-4 mr-2" />
-                Call Schedule
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Target className="w-4 h-4 mr-2" />
-                Sales Targets
-              </Button>
-            </CardContent>
-          </Card>
-
-          <FeatureModulesPanel 
-            availableModules={availableModules}
-            userId={user?.id}
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard
+            title="Lead Management"
+            description="Track and nurture sales leads"
+            icon={Users}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={0}
+          />
+          <QuickActionCard
+            title="Pipeline Tracking"
+            description="Monitor deals through sales stages"
+            icon={TrendingUp}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={100}
+          />
+          <QuickActionCard
+            title="Quote Generator"
+            description="Create professional quotes quickly"
+            icon={DollarSign}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="success"
+            delay={200}
+          />
+          <QuickActionCard
+            title="Sales Forecasting"
+            description="Predict future revenue trends"
+            icon={Target}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="warning"
+            delay={300}
+          />
+          <QuickActionCard
+            title="Email Campaigns"
+            description="Manage sales email sequences"
+            icon={Mail}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={400}
+          />
+          <QuickActionCard
+            title="Call Scheduler"
+            description="Schedule and track sales calls"
+            icon={Phone}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={500}
           />
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Deals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center py-8">
-              No recent deals. Start by adding leads to your pipeline.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

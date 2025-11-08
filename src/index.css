@@ -8,41 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    --background: 240 10% 98%;
+    --foreground: 222 47% 11%;
 
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
     --primary: 263 70% 50%;
     --primary-foreground: 210 40% 98%;
     --primary-glow: 280 80% 60%;
 
     --secondary: 190 95% 50%;
-    --secondary-foreground: 224 71% 4%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
     --accent: 190 95% 50%;
-    --accent-foreground: 224 71% 4%;
+    --accent-foreground: 222 47% 11%;
+
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --info: 217 91% 60%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 223 47% 11%;
-    --input: 223 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 263 70% 50%;
 
     --radius: 0.75rem;
 
     --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(190 95% 50%));
-    --gradient-card: linear-gradient(135deg, hsl(224 71% 6%), hsl(223 47% 11%));
-    --shadow-glow: 0 0 40px hsl(263 70% 50% / 0.4), 0 4px 24px hsl(0 0% 0% / 0.2);
-    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.2);
+    --gradient-secondary: linear-gradient(135deg, hsl(190 95% 50%), hsl(280 80% 60%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(240 10% 99%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(158 64% 52%));
+    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%), hsl(48 96% 53%));
+    --gradient-subtle: linear-gradient(180deg, hsl(240 10% 98%), hsl(220 14% 96%));
+    
+    --shadow-glow: 0 0 40px hsl(263 70% 50% / 0.15), 0 4px 24px hsl(0 0% 0% / 0.05);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.05), 0 1px 2px hsl(0 0% 0% / 0.06);
+    --shadow-card-hover: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    --shadow-button: 0 1px 2px hsl(0 0% 0% / 0.05);
     
     /* Spacing scale for consistency */
     --spacing-section: 8rem;

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Users, Calendar, TrendingUp, Settings, LogOut, Building2 } from "lucide-react";
+import { Users, Calendar, TrendingUp, UserPlus, Clock, Award, FileText, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const HRDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -32,7 +35,6 @@ const HRDashboard = () => {
         .eq("id", user.id)
         .single();
 
-      // Check if user has hr_manager role
       const { data: userRoles } = await supabase
         .from("user_roles")
         .select("role")
@@ -63,124 +65,133 @@ const HRDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-primary" />
-              HR Manager Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome back, {profile?.full_name || user?.email}
-            </p>
+    <DashboardLayout
+      title="HR Manager Dashboard"
+      subtitle={`Welcome back, ${profile?.full_name || user?.email}`}
+      icon={<Users className="w-8 h-8 text-primary" />}
+    >
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard
+          title="Total Employees"
+          value={245}
+          icon={Users}
+          trend={{ value: "12% from last month", isPositive: true }}
+          colorScheme="primary"
+        />
+        <StatCard
+          title="New Hires This Month"
+          value={18}
+          icon={UserPlus}
+          trend={{ value: "8% from last month", isPositive: true }}
+          colorScheme="success"
+        />
+        <StatCard
+          title="Pending Leave Requests"
+          value={7}
+          icon={Clock}
+          trend={{ value: "3 urgent", isPositive: false }}
+          colorScheme="warning"
+        />
+        <StatCard
+          title="Performance Reviews Due"
+          value={32}
+          icon={Award}
+          trend={{ value: "Due this week", isPositive: false }}
+          colorScheme="info"
+        />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard
+            title="Recruitment Tracking"
+            description="Manage job postings and candidate pipeline"
+            icon={Target}
+            onClick={() => navigate("/recruitment")}
+            colorScheme="primary"
+            delay={0}
+          />
+          <QuickActionCard
+            title="Employee Management"
+            description="View and manage employee records"
+            icon={Users}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={100}
+          />
+          <QuickActionCard
+            title="Leave Management"
+            description="Review and approve leave requests"
+            icon={Calendar}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="success"
+            delay={200}
+          />
+          <QuickActionCard
+            title="Performance Reviews"
+            description="Conduct and track performance evaluations"
+            icon={Award}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="warning"
+            delay={300}
+          />
+          <QuickActionCard
+            title="Onboarding Workflows"
+            description="Set up new hire onboarding processes"
+            icon={UserPlus}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={400}
+          />
+          <QuickActionCard
+            title="Reports & Analytics"
+            description="View HR metrics and insights"
+            icon={FileText}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={500}
+          />
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Recent Activity</h2>
+        <AnimatedCard className="p-6">
+          <div className="space-y-4">
+            {[
+              { name: "John Smith", action: "submitted leave request", time: "2 hours ago", icon: Clock },
+              { name: "Sarah Johnson", action: "completed onboarding", time: "5 hours ago", icon: UserPlus },
+              { name: "Mike Davis", action: "performance review scheduled", time: "1 day ago", icon: Award },
+            ].map((activity, index) => (
+              <div key={index} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <activity.icon className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">
+                    <span className="font-semibold">{activity.name}</span> {activity.action}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/feature-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Feature Settings
-            </Button>
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              Profile
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Users className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Employees</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-500/10 rounded-lg">
-                <Calendar className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Active Leave Requests</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <TrendingUp className="w-8 h-8 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Recruitment Pipeline</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => navigate("/recruitment")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                Manage Recruitment
-              </Button>
-              <Button 
-                onClick={() => navigate("/dashboard")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                Employee Management
-              </Button>
-              <Button 
-                onClick={() => navigate("/floor-planner")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                Floor Planner Module
-              </Button>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-            <p className="text-sm text-muted-foreground">
-              No recent activity to display
-            </p>
-          </Card>
-        </div>
-      </main>
-    </div>
+        </AnimatedCard>
+      </div>
+    </DashboardLayout>
   );
 };
 

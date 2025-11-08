@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingCart, Users, FileText, Settings, LogOut, TrendingDown, Package, BarChart3 } from "lucide-react";
+import { ShoppingCart, Users, FileText, Package, TrendingDown, BarChart3, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { FeatureModulesPanel } from "@/components/FeatureModulesPanel";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const ProcurementDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -63,150 +64,39 @@ const ProcurementDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
-  const availableModules = [
-    { name: "supplier_management", label: "Supplier Management", description: "Manage vendor relationships and contracts" },
-    { name: "purchase_orders", label: "Purchase Orders", description: "Create and track purchase orders" },
-    { name: "spend_analytics", label: "Spend Analytics", description: "Analyze spending patterns and savings" },
-    { name: "rfq_management", label: "RFQ Management", description: "Manage request for quotations" },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <ShoppingCart className="w-6 h-6 text-primary" />
-              Procurement Manager Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome back, {profile?.full_name || user?.email}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+    <DashboardLayout
+      title="Procurement Manager Dashboard"
+      subtitle={`Welcome back, ${profile?.full_name || user?.email}`}
+      icon={<ShoppingCart className="w-8 h-8 text-primary" />}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard title="Active Vendors" value={48} icon={Users} trend={{ value: "5 new this month", isPositive: true }} colorScheme="primary" />
+        <StatCard title="Open POs" value={23} icon={FileText} trend={{ value: "12 pending", isPositive: false }} colorScheme="warning" />
+        <StatCard title="Cost Savings" value="$125,400" icon={TrendingDown} trend={{ value: "This quarter", isPositive: true }} colorScheme="success" />
+        <StatCard title="Pending Deliveries" value={15} icon={Package} trend={{ value: "3 urgent", isPositive: false }} colorScheme="info" />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard title="Create Purchase Order" description="Generate new PO documents" icon={FileText} onClick={() => toast({ title: "Coming soon" })} colorScheme="primary" delay={0} />
+          <QuickActionCard title="Manage Vendors" description="View and update supplier info" icon={Users} onClick={() => toast({ title: "Coming soon" })} colorScheme="secondary" delay={100} />
+          <QuickActionCard title="Spend Analytics" description="Analyze spending patterns" icon={BarChart3} onClick={() => toast({ title: "Coming soon" })} colorScheme="success" delay={200} />
+          <QuickActionCard title="Track Deliveries" description="Monitor shipment status" icon={Package} onClick={() => toast({ title: "Coming soon" })} colorScheme="warning" delay={300} />
+          <QuickActionCard title="Contract Management" description="Manage vendor contracts" icon={CheckCircle} onClick={() => toast({ title: "Coming soon" })} colorScheme="primary" delay={400} />
+          <QuickActionCard title="RFQ Management" description="Request for quotations" icon={Clock} onClick={() => toast({ title: "Coming soon" })} colorScheme="secondary" delay={500} />
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Active Vendors
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Total suppliers</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Open POs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Purchase orders</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingDown className="w-4 h-4" />
-                Cost Savings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$--</div>
-              <p className="text-xs text-muted-foreground mt-1">This quarter</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Package className="w-4 h-4" />
-                Pending Deliveries
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Items</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-3">
-              <Button variant="outline" className="justify-start">
-                <FileText className="w-4 h-4 mr-2" />
-                Create Purchase Order
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Users className="w-4 h-4 mr-2" />
-                Manage Vendors
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Spend Analytics
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Package className="w-4 h-4 mr-2" />
-                Track Deliveries
-              </Button>
-            </CardContent>
-          </Card>
-
-          <FeatureModulesPanel 
-            availableModules={availableModules}
-            userId={user?.id}
-          />
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Purchase Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center py-8">
-              No recent purchase orders. Create your first PO to get started.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

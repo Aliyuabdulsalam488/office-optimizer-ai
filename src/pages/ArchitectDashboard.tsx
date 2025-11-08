@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Ruler, FileText, Users, Settings, LogOut, PenTool } from "lucide-react";
+import { PenTool, Ruler, FileText, Users, Home, Layers } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const ArchitectDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -32,7 +34,6 @@ const ArchitectDashboard = () => {
         .eq("id", user.id)
         .single();
 
-      // Check if user has architect role
       const { data: userRoles } = await supabase
         .from("user_roles")
         .select("role")
@@ -63,127 +64,39 @@ const ArchitectDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <PenTool className="w-6 h-6 text-primary" />
-              Architect Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome back, {profile?.full_name || user?.email}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+    <DashboardLayout
+      title="Architect Dashboard"
+      subtitle={`Welcome back, ${profile?.full_name || user?.email}`}
+      icon={<PenTool className="w-8 h-8 text-primary" />}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard title="Active Projects" value={12} icon={Home} trend={{ value: "3 new this month", isPositive: true }} colorScheme="primary" />
+        <StatCard title="Floor Plans" value={28} icon={FileText} trend={{ value: "8 in progress", isPositive: true }} colorScheme="success" />
+        <StatCard title="Clients" value={15} icon={Users} trend={{ value: "All active", isPositive: true }} colorScheme="info" />
+        <StatCard title="Reviews Pending" value={5} icon={Layers} trend={{ value: "This week", isPositive: false }} colorScheme="warning" />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard title="Floor Plan Editor" description="Create and edit floor plans" icon={Ruler} onClick={() => navigate("/floor-planner")} colorScheme="primary" delay={0} />
+          <QuickActionCard title="Create Project" description="Start a new architectural project" icon={FileText} onClick={() => navigate("/floor-planner")} colorScheme="secondary" delay={100} />
+          <QuickActionCard title="Client Management" description="Manage client relationships" icon={Users} onClick={() => toast({ title: "Coming soon" })} colorScheme="success" delay={200} />
+          <QuickActionCard title="3D Visualization" description="View projects in 3D" icon={Layers} onClick={() => toast({ title: "Coming soon" })} colorScheme="warning" delay={300} />
+          <QuickActionCard title="Cost Estimation" description="Estimate project costs" icon={PenTool} onClick={() => toast({ title: "Coming soon" })} colorScheme="primary" delay={400} />
+          <QuickActionCard title="Project Reviews" description="Review and approve designs" icon={Home} onClick={() => toast({ title: "Coming soon" })} colorScheme="secondary" delay={500} />
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Ruler className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Active Projects</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-500/10 rounded-lg">
-                <FileText className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Floor Plans</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <Users className="w-8 h-8 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Clients</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => navigate("/floor-planner")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                <Ruler className="w-4 h-4 mr-2" />
-                Floor Plan Editor
-              </Button>
-              <Button 
-                onClick={() => navigate("/floor-planner")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Create New Project
-              </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                onClick={() => toast({
-                  title: "Work in Progress",
-                  description: "Client management feature coming soon!",
-                })}
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Client Management
-              </Button>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Projects</h3>
-            <p className="text-sm text-muted-foreground">
-              No recent projects to display
-            </p>
-          </Card>
-        </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

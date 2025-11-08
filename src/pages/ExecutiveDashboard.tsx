@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, Calendar, DollarSign, Settings, LogOut, Plane, Receipt, FileText } from "lucide-react";
+import { Briefcase, Calendar, FileText, Plane, Receipt, CheckSquare, Mail, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { FeatureModulesPanel } from "@/components/FeatureModulesPanel";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const ExecutiveDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -63,150 +65,135 @@ const ExecutiveDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
-  const availableModules = [
-    { name: "calendar_management", label: "Calendar Management", description: "AI-powered meeting scheduling and coordination" },
-    { name: "travel_planning", label: "Travel Planning", description: "Book flights, hotels, and manage itineraries" },
-    { name: "expense_tracking", label: "Expense Tracking", description: "Track and submit business expenses" },
-    { name: "task_management", label: "Task Management", description: "Manage daily tasks and priorities" },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Briefcase className="w-6 h-6 text-primary" />
-              Executive Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome back, {profile?.full_name || user?.email}
-            </p>
+    <DashboardLayout
+      title="Executive Assistant Dashboard"
+      subtitle={`Welcome back, ${profile?.full_name || user?.email}`}
+      icon={<Briefcase className="w-8 h-8 text-primary" />}
+    >
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard
+          title="Today's Meetings"
+          value={8}
+          icon={Calendar}
+          trend={{ value: "3 upcoming", isPositive: true }}
+          colorScheme="primary"
+        />
+        <StatCard
+          title="Pending Tasks"
+          value={24}
+          icon={CheckSquare}
+          trend={{ value: "12 urgent", isPositive: false }}
+          colorScheme="warning"
+        />
+        <StatCard
+          title="Expenses to Review"
+          value="$2,450"
+          icon={Receipt}
+          trend={{ value: "5 items", isPositive: false }}
+          colorScheme="info"
+        />
+        <StatCard
+          title="Upcoming Trips"
+          value={3}
+          icon={Plane}
+          trend={{ value: "Next 30 days", isPositive: true }}
+          colorScheme="success"
+        />
+      </div>
+
+      {/* Today's Schedule */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Today's Schedule</h2>
+        <AnimatedCard className="p-6">
+          <div className="space-y-4">
+            {[
+              { time: "9:00 AM", title: "Executive Team Meeting", attendees: "5 attendees", status: "upcoming" },
+              { time: "11:30 AM", title: "Client Presentation Prep", attendees: "3 attendees", status: "upcoming" },
+              { time: "2:00 PM", title: "Budget Review", attendees: "2 attendees", status: "upcoming" },
+              { time: "4:00 PM", title: "Q4 Planning Session", attendees: "8 attendees", status: "upcoming" },
+            ].map((meeting, index) => (
+              <div key={index} className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="w-20 text-center">
+                  <p className="text-sm font-semibold text-primary">{meeting.time}</p>
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">{meeting.title}</p>
+                  <p className="text-sm text-muted-foreground">{meeting.attendees}</p>
+                </div>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">
+                  {meeting.status}
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+        </AnimatedCard>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Today's Meetings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Scheduled</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Pending Tasks
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">To complete</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Receipt className="w-4 h-4" />
-                Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$--</div>
-              <p className="text-xs text-muted-foreground mt-1">This month</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Plane className="w-4 h-4" />
-                Upcoming Trips
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground mt-1">Next 30 days</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-3">
-              <Button variant="outline" className="justify-start">
-                <Calendar className="w-4 h-4 mr-2" />
-                Schedule Meeting
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Plane className="w-4 h-4 mr-2" />
-                Plan Travel
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Receipt className="w-4 h-4 mr-2" />
-                Submit Expense
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <FileText className="w-4 h-4 mr-2" />
-                Manage Tasks
-              </Button>
-            </CardContent>
-          </Card>
-
-          <FeatureModulesPanel 
-            availableModules={availableModules}
-            userId={user?.id}
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard
+            title="Schedule Meeting"
+            description="Book time on executive's calendar"
+            icon={Calendar}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={0}
+          />
+          <QuickActionCard
+            title="Plan Travel"
+            description="Arrange flights and accommodations"
+            icon={Plane}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={100}
+          />
+          <QuickActionCard
+            title="Manage Expenses"
+            description="Review and submit expense reports"
+            icon={Receipt}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="warning"
+            delay={200}
+          />
+          <QuickActionCard
+            title="Task Management"
+            description="Track and prioritize daily tasks"
+            icon={CheckSquare}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="success"
+            delay={300}
+          />
+          <QuickActionCard
+            title="Email Management"
+            description="Organize and respond to emails"
+            icon={Mail}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={400}
+          />
+          <QuickActionCard
+            title="Call Log"
+            description="Manage incoming and outgoing calls"
+            icon={Phone}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={500}
           />
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Schedule</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center py-8">
-              No upcoming events. Connect your calendar to view your schedule.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
