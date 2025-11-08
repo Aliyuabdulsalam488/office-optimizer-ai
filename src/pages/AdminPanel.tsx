@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserPlus, Shield, RefreshCw } from "lucide-react";
+import { Search, UserPlus, Shield, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,17 @@ interface User {
   roles: string[];
 }
 
+interface RoleUpgradeRequest {
+  id: string;
+  user_id: string;
+  requested_role: string;
+  reason: string;
+  status: string;
+  created_at: string;
+  user_email?: string;
+  user_name?: string;
+}
+
 const AVAILABLE_ROLES = [
   { value: "admin", label: "Administrator" },
   { value: "hr_manager", label: "HR Manager" },
@@ -45,12 +56,14 @@ const AVAILABLE_ROLES = [
 const AdminPanel = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [upgradeRequests, setUpgradeRequests] = useState<RoleUpgradeRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [updatingRoles, setUpdatingRoles] = useState(false);
+  const [processingRequest, setProcessingRequest] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -101,6 +114,7 @@ const AdminPanel = () => {
       }
 
       await loadUsers();
+      await loadUpgradeRequests();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -151,6 +165,99 @@ const AdminPanel = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUpgradeRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("role_upgrade_requests")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Get user details for each request
+      const requestsWithUsers = await Promise.all(
+        (data || []).map(async (request) => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", request.user_id)
+            .single();
+
+          return {
+            ...request,
+            user_email: profile?.email || "Unknown",
+            user_name: profile?.full_name || "Unknown",
+          };
+        })
+      );
+
+      setUpgradeRequests(requestsWithUsers);
+    } catch (error: any) {
+      toast({
+        title: "Error loading requests",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpgradeRequest = async (
+    requestId: string,
+    userId: string,
+    requestedRole: string,
+    approve: boolean
+  ) => {
+    try {
+      setProcessingRequest(requestId);
+
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+
+      // Update request status
+      const { error: updateError } = await supabase
+        .from("role_upgrade_requests")
+        .update({
+          status: approve ? "approved" : "rejected",
+          reviewed_by: currentUser.id,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", requestId);
+
+      if (updateError) throw updateError;
+
+      // If approved, add the role
+      if (approve) {
+        const { error: roleError } = await supabase.from("user_roles").insert({
+          user_id: userId,
+          role: requestedRole as any,
+        });
+
+        if (roleError && !roleError.message.includes("duplicate")) {
+          throw roleError;
+        }
+      }
+
+      toast({
+        title: approve ? "Request approved" : "Request rejected",
+        description: approve
+          ? "User has been granted the new role"
+          : "Request has been rejected",
+      });
+
+      await loadUpgradeRequests();
+      await loadUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error processing request",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingRequest(null);
     }
   };
 
@@ -250,7 +357,13 @@ const AdminPanel = () => {
             className="pl-10"
           />
         </div>
-        <Button onClick={loadUsers} variant="outline">
+        <Button
+          onClick={() => {
+            loadUsers();
+            loadUpgradeRequests();
+          }}
+          variant="outline"
+        >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
         </Button>
@@ -285,6 +398,76 @@ const AdminPanel = () => {
           </div>
         </Card>
       </div>
+
+      {/* Pending Upgrade Requests */}
+      {upgradeRequests.length > 0 && (
+        <Card className="p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4">
+            Pending Role Upgrade Requests ({upgradeRequests.length})
+          </h3>
+          <div className="space-y-4">
+            {upgradeRequests.map((request) => (
+              <div
+                key={request.id}
+                className="p-4 border rounded-lg space-y-3"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium">{request.user_name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {request.user_email}
+                    </p>
+                    <p className="text-sm mt-2">
+                      Requesting:{" "}
+                      <Badge variant="secondary">
+                        {AVAILABLE_ROLES.find((r) => r.value === request.requested_role)
+                          ?.label || request.requested_role}
+                      </Badge>
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(request.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <p className="text-sm">{request.reason}</p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() =>
+                      handleUpgradeRequest(
+                        request.id,
+                        request.user_id,
+                        request.requested_role,
+                        true
+                      )
+                    }
+                    disabled={processingRequest === request.id}
+                    size="sm"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      handleUpgradeRequest(
+                        request.id,
+                        request.user_id,
+                        request.requested_role,
+                        false
+                      )
+                    }
+                    disabled={processingRequest === request.id}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Users Table */}
       <Card>

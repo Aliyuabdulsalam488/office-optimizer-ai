@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { triggerSuccessConfetti } from "@/utils/confetti";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { RoleUpgradeRequest } from "@/components/RoleUpgradeRequest";
 
 const employeeModules = [
   { name: "personal_development", displayName: "Personal Development", description: "Track your learning and career growth", category: "Development" },
@@ -204,6 +205,12 @@ const EmployeeDashboard = () => {
             delay={500}
           />
         </div>
+      </div>
+
+      {/* Role Upgrade Request */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Career Advancement</h2>
+        <RoleUpgradeRequest />
       </div>
 
       {/* Feature Modules */}

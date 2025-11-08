@@ -720,6 +720,42 @@ export type Database = {
         }
         Relationships: []
       }
+      role_upgrade_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_auth_methods: {
         Row: {
           created_at: string | null
