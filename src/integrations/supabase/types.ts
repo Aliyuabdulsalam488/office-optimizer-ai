@@ -70,6 +70,77 @@ export type Database = {
           },
         ]
       }
+      business_members: {
+        Row: {
+          business_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          id?: string
+          joined_at?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          brand_colors: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          industry: string | null
+          logo_url: string | null
+          name: string
+          owner_id: string
+          size: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand_colors?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          size?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand_colors?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          size?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       floor_plan_checks: {
         Row: {
           ai_suggestions: string | null
@@ -512,6 +583,7 @@ export type Database = {
       profiles: {
         Row: {
           account_type: string | null
+          business_id: string | null
           created_at: string | null
           department: string | null
           email: string | null
@@ -525,6 +597,7 @@ export type Database = {
         }
         Insert: {
           account_type?: string | null
+          business_id?: string | null
           created_at?: string | null
           department?: string | null
           email?: string | null
@@ -538,6 +611,7 @@ export type Database = {
         }
         Update: {
           account_type?: string | null
+          business_id?: string | null
           created_at?: string | null
           department?: string | null
           email?: string | null
@@ -549,7 +623,15 @@ export type Database = {
           role?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_auth_methods: {
         Row: {

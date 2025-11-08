@@ -18,6 +18,9 @@ import HRDashboard from "./pages/HRDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import ProfileSettings from "./pages/ProfileSettings";
 import Onboarding from "./pages/Onboarding";
+import ArchitectDashboard from "./pages/ArchitectDashboard";
+import HomeBuilderDashboard from "./pages/HomeBuilderDashboard";
+import { RoleBasedNav } from "./components/RoleBasedNav";
 
 const queryClient = new QueryClient();
 
@@ -27,12 +30,15 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <RoleBasedNav />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<EnhancedAuth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/hr-dashboard" element={<HRDashboard />} />
           <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+          <Route path="/architect-dashboard" element={<ArchitectDashboard />} />
+          <Route path="/home-builder-dashboard" element={<HomeBuilderDashboard />} />
           <Route path="/profile-settings" element={<ProfileSettings />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/recruitment" element={<Recruitment />} />

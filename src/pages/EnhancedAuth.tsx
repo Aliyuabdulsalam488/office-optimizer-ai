@@ -102,8 +102,17 @@ const EnhancedAuth = () => {
         .select("role")
         .eq("user_id", data.user.id);
 
-      const role = userRoles?.[0]?.role;
-      const redirectPath = role && role.toString() === "hr_manager" ? "/hr-dashboard" : "/employee-dashboard";
+      const role = userRoles?.[0]?.role?.toString();
+      
+      // Redirect based on primary role
+      let redirectPath = "/employee-dashboard";
+      if (role === "hr_manager") redirectPath = "/hr-dashboard";
+      else if (role === "architect") redirectPath = "/architect-dashboard";
+      else if (role === "home_builder") redirectPath = "/home-builder-dashboard";
+      else if (["finance_manager", "procurement_manager", "sales_manager", "executive", "admin"].includes(role || "")) {
+        redirectPath = "/dashboard";
+      }
+      
       navigate(redirectPath);
 
       toast({

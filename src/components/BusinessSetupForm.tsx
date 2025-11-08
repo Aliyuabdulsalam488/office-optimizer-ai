@@ -85,11 +85,33 @@ export const BusinessSetupForm = ({ onComplete }: BusinessSetupFormProps) => {
 
     setSaving(true);
     try {
-      // Save business info to user metadata or a separate table
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // You could save this to a businesses table or user metadata
+        // Save business to database
+        const { data: business, error: businessError } = await supabase
+          .from("businesses")
+          .insert({
+            name: businessInfo.name,
+            description: businessInfo.description,
+            industry: businessInfo.industry,
+            size: businessInfo.size,
+            brand_colors: businessInfo.brandColors,
+            owner_id: user.id
+          })
+          .select()
+          .single();
+
+        if (businessError) throw businessError;
+
+        // Update user profile with business_id
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ business_id: business.id })
+          .eq("id", user.id);
+
+        if (profileError) throw profileError;
+
         toast({
           title: "Business Created!",
           description: `${businessInfo.name} has been set up successfully.`
