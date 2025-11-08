@@ -142,9 +142,13 @@ const EnhancedAuth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      const msg = (error?.message || "").toLowerCase();
+      const providerDisabled = msg.includes("provider is not enabled") || msg.includes("unsupported provider");
       toast({
-        title: "Google login failed",
-        description: error.message,
+        title: providerDisabled ? "Google Sign-in not enabled" : "Google login failed",
+        description: providerDisabled
+          ? "Enable Google in your backend auth settings, then try again."
+          : (error.message || "An unexpected error occurred"),
         variant: "destructive",
       });
       setLoading(false);
