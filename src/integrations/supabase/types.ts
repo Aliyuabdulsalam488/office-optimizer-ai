@@ -70,6 +70,156 @@ export type Database = {
           },
         ]
       }
+      floor_plan_checks: {
+        Row: {
+          ai_suggestions: string | null
+          check_type: string
+          created_at: string | null
+          floor_plan_id: string
+          id: string
+          issues_found: Json | null
+          severity: string | null
+        }
+        Insert: {
+          ai_suggestions?: string | null
+          check_type: string
+          created_at?: string | null
+          floor_plan_id: string
+          id?: string
+          issues_found?: Json | null
+          severity?: string | null
+        }
+        Update: {
+          ai_suggestions?: string | null
+          check_type?: string
+          created_at?: string | null
+          floor_plan_id?: string
+          id?: string
+          issues_found?: Json | null
+          severity?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_checks_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plan_reviews: {
+        Row: {
+          comments: string | null
+          created_at: string | null
+          floor_plan_id: string
+          id: string
+          reviewer_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string | null
+          floor_plan_id: string
+          id?: string
+          reviewer_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string | null
+          floor_plan_id?: string
+          id?: string
+          reviewer_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_reviews_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plan_versions: {
+        Row: {
+          canvas_data: Json | null
+          created_at: string | null
+          file_url: string | null
+          floor_plan_id: string
+          id: string
+          thumbnail_url: string | null
+          version_number: number
+        }
+        Insert: {
+          canvas_data?: Json | null
+          created_at?: string | null
+          file_url?: string | null
+          floor_plan_id: string
+          id?: string
+          thumbnail_url?: string | null
+          version_number: number
+        }
+        Update: {
+          canvas_data?: Json | null
+          created_at?: string | null
+          file_url?: string | null
+          floor_plan_id?: string
+          id?: string
+          thumbnail_url?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plan_versions_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      floor_plans: {
+        Row: {
+          area_sqm: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          project_type: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          area_sqm?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          project_type?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          area_sqm?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          project_type?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       interviews: {
         Row: {
           ai_evaluation: string | null
@@ -207,15 +357,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "architect" | "reviewer" | "business_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -342,6 +519,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "architect", "reviewer", "business_user"],
+    },
   },
 } as const
