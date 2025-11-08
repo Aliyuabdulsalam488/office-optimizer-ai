@@ -3,29 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpCircle, Clock, CheckCircle, XCircle } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-interface RoleRequest {
-  id: string;
-  requested_role: string;
-  reason: string;
-  status: string;
-  created_at: string;
-  reviewed_at: string | null;
-}
-
-const ROLE_OPTIONS = [
+const AVAILABLE_ROLES = [
   { value: "hr_manager", label: "HR Manager" },
   { value: "finance_manager", label: "Finance Manager" },
   { value: "sales_manager", label: "Sales Manager" },
@@ -35,6 +19,15 @@ const ROLE_OPTIONS = [
   { value: "architect", label: "Architect" },
   { value: "home_builder", label: "Home Builder" },
 ];
+
+interface RoleRequest {
+  id: string;
+  requested_role: string;
+  reason: string | null;
+  status: string;
+  created_at: string;
+  reviewed_at: string | null;
+}
 
 export const RoleUpgradeRequest = () => {
   const [requests, setRequests] = useState<RoleRequest[]>([]);
@@ -85,13 +78,15 @@ export const RoleUpgradeRequest = () => {
     try {
       setSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from("role_upgrade_requests").insert({
-        user_id: user.id,
-        requested_role: selectedRole as any,
-        reason: reason.trim(),
-      });
+      const { error } = await supabase
+        .from("role_upgrade_requests")
+        .insert([{
+          user_id: user.id,
+          requested_role: selectedRole as any,
+          reason: reason.trim(),
+        }]);
 
       if (error) throw error;
 
@@ -117,37 +112,20 @@ export const RoleUpgradeRequest = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return (
-          <Badge variant="outline" className="gap-1">
-            <Clock className="w-3 h-3" />
-            Pending
-          </Badge>
-        );
+        return <Badge variant="outline" className="bg-yellow-500/10"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       case "approved":
-        return (
-          <Badge className="gap-1 bg-green-500">
-            <CheckCircle className="w-3 h-3" />
-            Approved
-          </Badge>
-        );
+        return <Badge variant="outline" className="bg-green-500/10"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
       case "rejected":
-        return (
-          <Badge variant="destructive" className="gap-1">
-            <XCircle className="w-3 h-3" />
-            Rejected
-          </Badge>
-        );
+        return <Badge variant="outline" className="bg-red-500/10"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
       default:
-        return <Badge>{status}</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
-
-  const hasPendingRequest = requests.some((r) => r.status === "pending");
 
   if (loading) {
     return (
       <Card className="p-6">
-        <LoadingSpinner size="lg" text="Loading requests..." />
+        <LoadingSpinner size="sm" text="Loading requests..." />
       </Card>
     );
   }
@@ -155,20 +133,25 @@ export const RoleUpgradeRequest = () => {
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-6">
           <ArrowUpCircle className="w-6 h-6 text-primary" />
-          <h3 className="text-xl font-semibold">Request Role Upgrade</h3>
+          <div>
+            <h3 className="text-lg font-semibold">Request Role Upgrade</h3>
+            <p className="text-sm text-muted-foreground">
+              Request access to additional roles and responsibilities
+            </p>
+          </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="role">Role you want to upgrade to</Label>
+            <label className="text-sm font-medium mb-2 block">Requested Role</label>
             <Select value={selectedRole} onValueChange={setSelectedRole}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                {ROLE_OPTIONS.map((role) => (
+                {AVAILABLE_ROLES.map((role) => (
                   <SelectItem key={role.value} value={role.value}>
                     {role.label}
                   </SelectItem>
@@ -178,20 +161,20 @@ export const RoleUpgradeRequest = () => {
           </div>
 
           <div>
-            <Label htmlFor="reason">Reason for upgrade request</Label>
+            <label className="text-sm font-medium mb-2 block">
+              Reason for Request
+            </label>
             <Textarea
-              id="reason"
+              placeholder="Explain why you need this role and how you'll use it..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Explain why you should be upgraded to this role..."
               rows={4}
-              className="resize-none"
             />
           </div>
 
           <Button
             onClick={submitRequest}
-            disabled={submitting || hasPendingRequest}
+            disabled={submitting || !selectedRole || !reason.trim()}
             className="w-full"
           >
             {submitting ? (
@@ -203,13 +186,6 @@ export const RoleUpgradeRequest = () => {
               "Submit Request"
             )}
           </Button>
-
-          {hasPendingRequest && (
-            <p className="text-sm text-muted-foreground text-center">
-              You have a pending request. Wait for review before submitting
-              another.
-            </p>
-          )}
         </div>
       </Card>
 
@@ -223,18 +199,20 @@ export const RoleUpgradeRequest = () => {
                 className="p-4 border rounded-lg space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">
-                      {ROLE_OPTIONS.find((r) => r.value === request.requested_role)
-                        ?.label || request.requested_role}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(request.created_at).toLocaleDateString()}
-                    </p>
+                  <div className="font-medium">
+                    {AVAILABLE_ROLES.find((r) => r.value === request.requested_role)?.label || request.requested_role}
                   </div>
                   {getStatusBadge(request.status)}
                 </div>
-                <p className="text-sm">{request.reason}</p>
+                {request.reason && (
+                  <p className="text-sm text-muted-foreground">{request.reason}</p>
+                )}
+                <div className="text-xs text-muted-foreground">
+                  Submitted: {new Date(request.created_at).toLocaleDateString()}
+                  {request.reviewed_at && (
+                    <> • Reviewed: {new Date(request.reviewed_at).toLocaleDateString()}</>
+                  )}
+                </div>
               </div>
             ))}
           </div>

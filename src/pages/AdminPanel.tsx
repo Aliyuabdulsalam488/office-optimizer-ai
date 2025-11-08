@@ -29,15 +29,30 @@ interface User {
   roles: string[];
 }
 
+interface RoleRequest {
+  id: string;
+  user_id: string;
+  requested_role: string;
+  reason: string | null;
+  status: string;
+  created_at: string;
+  profiles?: {
+    email: string;
+    full_name: string;
+  };
+}
+
 interface RoleUpgradeRequest {
   id: string;
   user_id: string;
   requested_role: string;
-  reason: string;
+  reason: string | null;
   status: string;
   created_at: string;
-  user_email?: string;
-  user_name?: string;
+  profiles?: {
+    email: string;
+    full_name: string;
+  };
 }
 
 const AVAILABLE_ROLES = [
@@ -275,6 +290,95 @@ const AdminPanel = () => {
     );
   };
 
+  const loadRoleRequests = async () => {
+    try {
+      const { data: requests, error } = await supabase
+        .from("role_upgrade_requests")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Get profile data separately
+      const enrichedRequests = await Promise.all(
+        (requests || []).map(async (request) => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", request.user_id)
+            .single();
+          
+          return {
+            ...request,
+            profiles: profile || undefined,
+          };
+        })
+      );
+
+      setUpgradeRequests(enrichedRequests);
+    } catch (error: any) {
+      toast({
+        title: "Error loading requests",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRoleRequest = async (requestId: string, action: "approve" | "reject") => {
+    try {
+      setProcessingRequest(requestId);
+      const request = upgradeRequests.find(r => r.id === requestId);
+      if (!request) return;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Update request status
+      const { error: updateError } = await supabase
+        .from("role_upgrade_requests")
+        .update({
+          status: action === "approve" ? "approved" : "rejected",
+          reviewed_by: user.id,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", requestId);
+
+      if (updateError) throw updateError;
+
+      // If approved, add the role
+      if (action === "approve") {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: request.user_id,
+            role: request.requested_role as any,
+          });
+
+        if (roleError && !roleError.message.includes("duplicate")) {
+          throw roleError;
+        }
+      }
+
+      toast({
+        title: action === "approve" ? "Request approved" : "Request rejected",
+        description: `Role upgrade request has been ${action === "approve" ? "approved" : "rejected"}`,
+      });
+
+      await loadRoleRequests();
+      await loadUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error processing request",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingRequest(null);
+    }
+  };
+
   const updateUserRoles = async () => {
     if (!selectedUser) return;
 
@@ -413,9 +517,9 @@ const AdminPanel = () => {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium">{request.user_name}</p>
+                    <p className="font-medium">{request.profiles?.full_name || "Unknown User"}</p>
                     <p className="text-sm text-muted-foreground">
-                      {request.user_email}
+                      {request.profiles?.email}
                     </p>
                     <p className="text-sm mt-2">
                       Requesting:{" "}
