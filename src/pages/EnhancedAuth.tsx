@@ -22,7 +22,7 @@ const signupSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(8, "Password must be at least 8 characters"),
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  role: z.enum(["employee", "hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin"]),
+  role: z.enum(["employee", "hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin", "architect", "home_builder"]),
   loginMethod: z.enum(["email_link", "email_password", "google"]),
 });
 
@@ -176,7 +176,7 @@ const EnhancedAuth = () => {
       }
 
       // Check if business setup is needed based on role
-      const needsBusinessSetup = ["hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin"].includes(data.role);
+      const needsBusinessSetup = ["hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin", "architect", "home_builder"].includes(data.role);
       
       if (needsBusinessSetup) {
         setShowBusinessSetup(true);
@@ -416,6 +416,18 @@ const EnhancedAuth = () => {
                     <RadioGroupItem value="executive" id="executive" />
                     <Label htmlFor="executive" className="cursor-pointer">
                       Executive
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="architect" id="architect" />
+                    <Label htmlFor="architect" className="cursor-pointer">
+                      Architect
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="home_builder" id="home_builder" />
+                    <Label htmlFor="home_builder" className="cursor-pointer">
+                      Home Builder
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">

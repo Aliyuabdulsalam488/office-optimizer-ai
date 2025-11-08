@@ -151,6 +151,8 @@ const ProfileSettings = () => {
                            role === "procurement_manager" ? "Procurement Manager" :
                            role === "sales_manager" ? "Sales Manager" :
                            role === "executive" ? "Executive" :
+                           role === "architect" ? "Architect" :
+                           role === "home_builder" ? "Home Builder" :
                            role === "admin" ? "Admin" : "Employee";
                   }).join(", ") || "Employee"}
                   disabled
