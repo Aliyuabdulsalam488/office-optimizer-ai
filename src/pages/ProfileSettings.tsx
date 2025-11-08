@@ -38,8 +38,14 @@ const ProfileSettings = () => {
         .eq("id", user.id)
         .single();
 
+      // Get user roles
+      const { data: userRoles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
       setUser(user);
-      setProfile(profileData);
+      setProfile({ ...profileData, roles: userRoles || [] });
       setPreferences(profileData?.preferences || {});
     } catch (error: any) {
       toast({
@@ -136,9 +142,17 @@ const ProfileSettings = () => {
                 </p>
               </div>
               <div>
-                <Label>Role</Label>
+                <Label>Role(s)</Label>
                 <Input
-                  value={profile?.role === "hr_manager" ? "HR Manager" : "Employee"}
+                  value={profile?.roles?.map((r: any) => {
+                    const role = r.role.toString();
+                    return role === "hr_manager" ? "HR Manager" :
+                           role === "finance_manager" ? "Finance Manager" :
+                           role === "procurement_manager" ? "Procurement Manager" :
+                           role === "sales_manager" ? "Sales Manager" :
+                           role === "executive" ? "Executive" :
+                           role === "admin" ? "Admin" : "Employee";
+                  }).join(", ") || "Employee"}
                   disabled
                   className="bg-muted"
                 />

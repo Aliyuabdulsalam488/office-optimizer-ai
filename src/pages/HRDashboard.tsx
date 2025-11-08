@@ -32,7 +32,15 @@ const HRDashboard = () => {
         .eq("id", user.id)
         .single();
 
-      if (profileData?.role !== "hr_manager") {
+      // Check if user has hr_manager role
+      const { data: userRoles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
+      const hasHRRole = userRoles?.some(r => r.role.toString() === "hr_manager");
+
+      if (!hasHRRole) {
         toast({
           title: "Access denied",
           description: "This dashboard is for HR Managers only",

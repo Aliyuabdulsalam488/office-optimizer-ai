@@ -21,7 +21,7 @@ const signupSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(8, "Password must be at least 8 characters"),
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  role: z.enum(["hr_manager", "employee"]),
+  role: z.enum(["employee", "hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin"]),
   loginMethod: z.enum(["email_link", "email_password", "google"]),
 });
 
@@ -94,14 +94,14 @@ const EnhancedAuth = () => {
 
       if (error) throw error;
 
-      // Get user profile to determine redirect
-      const { data: profile } = await supabase
-        .from("profiles")
+      // Get user role to determine redirect
+      const { data: userRoles } = await supabase
+        .from("user_roles")
         .select("role")
-        .eq("id", data.user.id)
-        .single();
+        .eq("user_id", data.user.id);
 
-      const redirectPath = profile?.role === "hr_manager" ? "/hr-dashboard" : "/employee-dashboard";
+      const role = userRoles?.[0]?.role;
+      const redirectPath = role && role.toString() === "hr_manager" ? "/hr-dashboard" : "/employee-dashboard";
       navigate(redirectPath);
 
       toast({
@@ -345,7 +345,7 @@ const EnhancedAuth = () => {
                 <RadioGroup
                   value={signupForm.watch("role")}
                   onValueChange={(v) => signupForm.setValue("role", v as any)}
-                  className="mt-2 space-y-2"
+                  className="mt-2 grid grid-cols-2 gap-3"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="employee" id="employee" />
@@ -357,6 +357,36 @@ const EnhancedAuth = () => {
                     <RadioGroupItem value="hr_manager" id="hr_manager" />
                     <Label htmlFor="hr_manager" className="cursor-pointer">
                       HR Manager
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="finance_manager" id="finance_manager" />
+                    <Label htmlFor="finance_manager" className="cursor-pointer">
+                      Finance Manager
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="procurement_manager" id="procurement_manager" />
+                    <Label htmlFor="procurement_manager" className="cursor-pointer">
+                      Procurement Manager
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="sales_manager" id="sales_manager" />
+                    <Label htmlFor="sales_manager" className="cursor-pointer">
+                      Sales Manager
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="executive" id="executive" />
+                    <Label htmlFor="executive" className="cursor-pointer">
+                      Executive
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="admin" id="admin" />
+                    <Label htmlFor="admin" className="cursor-pointer">
+                      Admin
                     </Label>
                   </div>
                 </RadioGroup>
