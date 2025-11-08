@@ -22,11 +22,11 @@ const HowItWorks = () => {
   return (
     <section id="how-it-works" className="py-20 px-6 relative overflow-hidden">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/5 to-background" />
       
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
             Get Started in 3 Steps
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -34,20 +34,27 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
               <div
                 key={index}
-                className="relative text-center"
+                className="relative text-center animate-scale-in-bounce"
+                style={{ animationDelay: `${index * 200}ms` }}
               >
-                <div className="flex flex-col items-center">
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center shadow-lg">
+                {/* Connection Line */}
+                {index < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-10 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary to-secondary" />
+                )}
+                
+                <div className="flex flex-col items-center relative z-10">
+                  <div className="relative mb-6 group">
+                    <div className="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-glow-pulse" />
+                    <div className="relative w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-10 h-10 text-primary-foreground" />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground shadow-md text-sm">
+                    <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-gradient-secondary flex items-center justify-center font-bold text-secondary-foreground shadow-md text-sm">
                       {index + 1}
                     </div>
                   </div>

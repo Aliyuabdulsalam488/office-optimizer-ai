@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Calendar, FileText, User, Settings, LogOut, Briefcase } from "lucide-react";
+import { Calendar, FileText, Briefcase, BookOpen, Award, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { StatCard } from "@/components/ui/stat-card";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Progress } from "@/components/ui/progress";
+import { triggerSuccessConfetti } from "@/utils/confetti";
 
 const EmployeeDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -45,130 +50,153 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
+  const handleTaskComplete = () => {
+    triggerSuccessConfetti();
+    toast({
+      title: "Great job! 🎉",
+      description: "Task completed successfully",
+    });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Briefcase className="w-6 h-6 text-primary" />
-              Employee Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome, {profile?.full_name || user?.email}
-            </p>
+    <DashboardLayout
+      title="Employee Dashboard"
+      subtitle={`Welcome, ${profile?.full_name || user?.email}`}
+      icon={<Briefcase className="w-8 h-8 text-primary" />}
+    >
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard
+          title="Leave Balance"
+          value="12 days"
+          icon={Calendar}
+          trend={{ value: "Remaining this year", isPositive: true }}
+          colorScheme="primary"
+        />
+        <StatCard
+          title="Tasks Assigned"
+          value={8}
+          icon={CheckCircle}
+          trend={{ value: "3 due today", isPositive: false }}
+          colorScheme="warning"
+        />
+        <StatCard
+          title="Trainings"
+          value={2}
+          icon={BookOpen}
+          trend={{ value: "1 upcoming", isPositive: true }}
+          colorScheme="info"
+        />
+        <StatCard
+          title="Achievements"
+          value={15}
+          icon={Award}
+          trend={{ value: "This quarter", isPositive: true }}
+          colorScheme="success"
+        />
+      </div>
+
+      {/* Current Tasks */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Current Tasks</h2>
+        <AnimatedCard className="p-6">
+          <div className="space-y-4">
+            {[
+              { task: "Complete Q4 Report", progress: 75, due: "Today", priority: "high" },
+              { task: "Team Meeting Preparation", progress: 50, due: "Tomorrow", priority: "medium" },
+              { task: "Code Review - Feature X", progress: 90, due: "This Week", priority: "low" },
+              { task: "Update Documentation", progress: 30, due: "Next Week", priority: "medium" },
+            ].map((item, index) => (
+              <div key={index} className="group">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleTaskComplete}
+                      className="w-5 h-5 rounded border-2 border-primary hover:bg-primary transition-colors"
+                    />
+                    <span className="font-medium">{item.task}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      item.priority === "high" ? "bg-destructive/10 text-destructive" :
+                      item.priority === "medium" ? "bg-warning/10 text-warning" :
+                      "bg-success/10 text-success"
+                    }`}>
+                      {item.priority}
+                    </span>
+                    <span className="text-sm text-muted-foreground">{item.due}</span>
+                  </div>
+                </div>
+                <Progress value={item.progress} className="h-2" />
+              </div>
+            ))}
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => navigate("/feature-settings")} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Feature Settings
-            </Button>
-            <Button onClick={() => navigate("/profile-settings")} variant="outline">
-              Profile
-            </Button>
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+        </AnimatedCard>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickActionCard
+            title="Request Leave"
+            description="Submit time-off requests"
+            icon={Calendar}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={0}
+          />
+          <QuickActionCard
+            title="View Payslips"
+            description="Access payment history"
+            icon={FileText}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={100}
+          />
+          <QuickActionCard
+            title="Training Programs"
+            description="Browse available courses"
+            icon={BookOpen}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="success"
+            delay={200}
+          />
+          <QuickActionCard
+            title="Team Directory"
+            description="Connect with colleagues"
+            icon={Briefcase}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="warning"
+            delay={300}
+          />
+          <QuickActionCard
+            title="Performance Reviews"
+            description="View feedback and goals"
+            icon={Award}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="primary"
+            delay={400}
+          />
+          <QuickActionCard
+            title="Benefits Info"
+            description="Explore employee benefits"
+            icon={CheckCircle}
+            onClick={() => toast({ title: "Coming soon" })}
+            colorScheme="secondary"
+            delay={500}
+          />
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Calendar className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Leave Balance</p>
-                <h3 className="text-2xl font-bold">-- days</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-500/10 rounded-lg">
-                <FileText className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Pending Approvals</p>
-                <h3 className="text-2xl font-bold">--</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <User className="w-8 h-8 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Profile Completion</p>
-                <h3 className="text-2xl font-bold">{profile?.onboarding_completed ? "100%" : "--"}</h3>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => navigate("/profile-settings")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Update Profile
-              </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                onClick={() => toast({
-                  title: "Work in Progress",
-                  description: "Leave management feature coming soon!",
-                })}
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Request Leave
-              </Button>
-              <Button 
-                onClick={() => navigate("/jobs")} 
-                className="w-full justify-start" 
-                variant="outline"
-              >
-                <Briefcase className="w-4 h-4 mr-2" />
-                Browse Jobs
-              </Button>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-            <p className="text-sm text-muted-foreground">
-              No new notifications
-            </p>
-          </Card>
-        </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

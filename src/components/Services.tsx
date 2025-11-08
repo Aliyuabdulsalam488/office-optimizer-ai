@@ -78,8 +78,11 @@ const Services = () => {
 
   return (
     <>
-      <section id="solutions" className="py-20 px-6 relative">
-      <div className="max-w-7xl mx-auto">
+      <section id="solutions" className="py-20 px-6 relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+        
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
             What We Automate
@@ -102,7 +105,8 @@ const Services = () => {
             return (
               <Card
                 key={index}
-                className="p-6 bg-gradient-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg group cursor-pointer"
+                className="p-6 bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2 group cursor-pointer animate-scale-in-bounce"
+                style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => {
                   if (isBusinessSetup) setShowBusinessSetup(true);
                   if (isFinance) setShowFinanceSelector(true);
@@ -114,8 +118,8 @@ const Services = () => {
                 }}
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6 text-primary-foreground" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-glow">
+                    <Icon className="w-7 h-7 text-primary-foreground" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
