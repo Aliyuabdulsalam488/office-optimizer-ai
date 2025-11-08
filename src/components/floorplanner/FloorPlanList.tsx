@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Calendar, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface FloorPlan {
   id: string;
@@ -67,7 +68,7 @@ const FloorPlanList = ({ onSelectPlan }: FloorPlanListProps) => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="lg" text="Loading floor plans..." />
       </div>
     );
   }

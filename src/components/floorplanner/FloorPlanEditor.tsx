@@ -13,6 +13,7 @@ import FloorPlan3DViewer from "./FloorPlan3DViewer";
 import ExportPanel from "./ExportPanel";
 import CostEstimator from "./CostEstimator";
 import CollaborationPanel from "./CollaborationPanel";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface FloorPlanEditorProps {
   planId: string;
@@ -101,7 +102,7 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading floor plan..." />
       </div>
     );
   }

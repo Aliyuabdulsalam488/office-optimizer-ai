@@ -10,9 +10,10 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft } from "lucide-react";
+import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BusinessSetupForm } from "@/components/BusinessSetupForm";
+import { LoadingOverlay } from "@/components/ui/loading-spinner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -313,8 +314,10 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
-      <Card className="w-full max-w-md p-8">
+    <>
+      {loading && <LoadingOverlay text="Processing..." />}
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
+        <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome to TechStora</h1>
           <p className="text-muted-foreground">
@@ -369,8 +372,12 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
                   className="w-full"
                   variant="outline"
                 >
-                  <Chrome className="w-4 h-4 mr-2" />
-                  Continue with Google
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Chrome className="w-4 h-4 mr-2" />
+                  )}
+                  {loading ? "Connecting..." : "Continue with Google"}
                 </Button>
               ) : loginMethod === "email_link" ? (
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
@@ -389,8 +396,12 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
                     )}
                   </div>
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Send Login Link
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Mail className="w-4 h-4 mr-2" />
+                    )}
+                    {loading ? "Sending..." : "Send Login Link"}
                   </Button>
                 </form>
               ) : (
@@ -424,8 +435,12 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
                     />
                   </div>
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    Sign In
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <LogIn className="w-4 h-4 mr-2" />
+                    )}
+                    {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
               )}
@@ -577,14 +592,19 @@ const handleSignup = async (data: z.infer<typeof signupSchema>) => {
               )}
 
               <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Create Account
+                {loading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <UserPlus className="w-4 h-4 mr-2" />
+                )}
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </TabsContent>
         </Tabs>
       </Card>
     </div>
+    </>
   );
 };
 

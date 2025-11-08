@@ -14,6 +14,7 @@ import { Plus, Briefcase, Users, Calendar, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { z } from "zod";
 import AIRecruitmentPanel from "./AIRecruitmentPanel";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const jobSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
@@ -397,7 +398,11 @@ const RecruitmentTracking = ({ view = 'jobs' }: RecruitmentTrackingProps) => {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <div className="text-center py-12">
+        <LoadingSpinner size="lg" text="Loading recruitment data..." />
+      </div>
+    );
   }
 
   return (

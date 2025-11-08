@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Lightbulb } from "lucide-react";
+import { Sparkles, Lightbulb, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -81,7 +81,11 @@ const AISuggestions = ({ planId, planData }: AISuggestionsProps) => {
           disabled={loading}
           className="bg-gradient-primary"
         >
-          <Sparkles className="w-4 h-4 mr-2" />
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4 mr-2" />
+          )}
           {loading ? "Generating..." : "Generate Suggestions"}
         </Button>
       </Card>

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Share2, Users, Send } from "lucide-react";
+import { MessageSquare, Share2, Users, Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -177,8 +177,12 @@ const CollaborationPanel = ({ planId }: CollaborationPanelProps) => {
             disabled={loading || !shareEmail}
             className="w-full"
           >
-            <Share2 className="w-4 h-4 mr-2" />
-            Share Floor Plan
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Share2 className="w-4 h-4 mr-2" />
+            )}
+            {loading ? "Sharing..." : "Share Floor Plan"}
           </Button>
         </div>
 
@@ -218,8 +222,12 @@ const CollaborationPanel = ({ planId }: CollaborationPanelProps) => {
               disabled={loading || !newComment.trim()}
               size="sm"
             >
-              <Send className="w-4 h-4 mr-2" />
-              Post Comment
+              {loading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4 mr-2" />
+              )}
+              {loading ? "Posting..." : "Post Comment"}
             </Button>
           </div>
 
