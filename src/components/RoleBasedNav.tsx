@@ -21,6 +21,7 @@ import {
   Menu,
   Settings,
   LogOut,
+  Shield,
 } from "lucide-react";
 
 export const RoleBasedNav = () => {
@@ -72,25 +73,25 @@ export const RoleBasedNav = () => {
     {
       role: "finance_manager",
       label: "Finance",
-      path: "/dashboard",
+      path: "/finance-dashboard",
       icon: DollarSign,
     },
     {
       role: "procurement_manager",
       label: "Procurement",
-      path: "/dashboard",
+      path: "/procurement-dashboard",
       icon: ShoppingCart,
     },
     {
       role: "sales_manager",
       label: "Sales",
-      path: "/dashboard",
+      path: "/sales-dashboard",
       icon: TrendingUp,
     },
     {
       role: "executive",
       label: "Executive",
-      path: "/dashboard",
+      path: "/executive-dashboard",
       icon: Briefcase,
     },
     {
@@ -110,6 +111,12 @@ export const RoleBasedNav = () => {
       label: "Employee",
       path: "/employee-dashboard",
       icon: Users,
+    },
+    {
+      role: "admin",
+      label: "Admin Panel",
+      path: "/admin",
+      icon: Shield,
     },
   ];
 

@@ -5,15 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, UserPlus, Shield, Trash2 } from "lucide-react";
+import { Search, UserPlus, Shield, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Table,
   TableBody,
@@ -23,13 +21,36 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  created_at: string;
+  roles: string[];
+}
+
+const AVAILABLE_ROLES = [
+  { value: "admin", label: "Administrator" },
+  { value: "hr_manager", label: "HR Manager" },
+  { value: "finance_manager", label: "Finance Manager" },
+  { value: "sales_manager", label: "Sales Manager" },
+  { value: "procurement_manager", label: "Procurement Manager" },
+  { value: "executive", label: "Executive" },
+  { value: "executive_assistant", label: "Executive Assistant" },
+  { value: "architect", label: "Architect" },
+  { value: "home_builder", label: "Home Builder" },
+  { value: "employee", label: "Employee" },
+];
+
 const AdminPanel = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [users, setUsers] = useState<any[]>([]);
-  const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [selectedRole, setSelectedRole] = useState("architect");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [updatingRoles, setUpdatingRoles] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -37,37 +58,94 @@ const AdminPanel = () => {
     checkAdminAccess();
   }, []);
 
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredUsers(users);
+    } else {
+      const query = searchQuery.toLowerCase();
+      setFilteredUsers(
+        users.filter(
+          (user) =>
+            user.email?.toLowerCase().includes(query) ||
+            user.full_name?.toLowerCase().includes(query) ||
+            user.roles.some((role) => role.toLowerCase().includes(query))
+        )
+      );
+    }
+  }, [searchQuery, users]);
+
   const checkAdminAccess = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
         navigate("/auth");
         return;
       }
 
-      const { data: roleData } = await supabase
+      const { data: userRoles } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
+        .eq("user_id", user.id);
 
-      if (!roleData) {
+      const isAdmin = userRoles?.some((r) => r.role.toString() === "admin");
+
+      if (!isAdmin) {
         toast({
           title: "Access denied",
-          description: "You need admin privileges to access this page",
+          description: "This panel is for administrators only",
           variant: "destructive",
         });
-        navigate("/dashboard");
+        navigate("/employee-dashboard");
         return;
       }
 
-      setIsAdmin(true);
-      await fetchUsers();
-      await fetchUserRoles();
+      await loadUsers();
     } catch (error: any) {
       toast({
         title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      navigate("/auth");
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+
+      // Get all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, created_at")
+        .order("created_at", { ascending: false });
+
+      if (profilesError) throw profilesError;
+
+      // Get all user roles
+      const { data: allRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with their roles
+      const usersWithRoles: User[] = (profiles || []).map((profile) => ({
+        id: profile.id,
+        email: profile.email || "",
+        full_name: profile.full_name || "N/A",
+        created_at: profile.created_at || "",
+        roles: allRoles
+          ?.filter((r) => r.user_id === profile.id)
+          .map((r) => r.role.toString()) || [],
+      }));
+
+      setUsers(usersWithRoles);
+      setFilteredUsers(usersWithRoles);
+    } catch (error: any) {
+      toast({
+        title: "Error loading users",
         description: error.message,
         variant: "destructive",
       });
@@ -76,258 +154,251 @@ const AdminPanel = () => {
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error fetching users",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const openRoleDialog = (user: User) => {
+    setSelectedUser(user);
+    setSelectedRoles(user.roles);
+    setShowRoleDialog(true);
   };
 
-  const fetchUserRoles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setUserRoles(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error fetching roles",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const handleRoleToggle = (role: string) => {
+    setSelectedRoles((prev) =>
+      prev.includes(role)
+        ? prev.filter((r) => r !== role)
+        : [...prev, role]
+    );
   };
 
-  const assignRole = async () => {
-    if (!selectedUserId) return;
+  const updateUserRoles = async () => {
+    if (!selectedUser) return;
 
     try {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert([{
-          user_id: selectedUserId,
-          role: selectedRole as "admin" | "architect" | "reviewer" | "business_user",
-        }]);
+      setUpdatingRoles(true);
 
-      if (error) throw error;
+      // Get current roles
+      const currentRoles = selectedUser.roles;
+      const newRoles = selectedRoles;
 
-      await fetchUserRoles();
-      setSelectedUserId("");
+      // Roles to add
+      const rolesToAdd = newRoles.filter((role) => !currentRoles.includes(role));
+
+      // Roles to remove
+      const rolesToRemove = currentRoles.filter((role) => !newRoles.includes(role));
+
+      // Add new roles
+      if (rolesToAdd.length > 0) {
+        const { error: insertError } = await supabase.from("user_roles").insert(
+          rolesToAdd.map((role) => ({
+            user_id: selectedUser.id,
+            role: role as any,
+          }))
+        );
+
+        if (insertError) throw insertError;
+      }
+
+      // Remove old roles
+      if (rolesToRemove.length > 0) {
+        const { error: deleteError } = await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", selectedUser.id)
+          .in("role", rolesToRemove as any);
+
+        if (deleteError) throw deleteError;
+      }
 
       toast({
-        title: "Role assigned",
-        description: `${selectedRole} role has been assigned successfully`,
+        title: "Roles updated",
+        description: `Updated roles for ${selectedUser.email}`,
       });
+
+      setShowRoleDialog(false);
+      await loadUsers();
     } catch (error: any) {
       toast({
-        title: "Error assigning role",
+        title: "Error updating roles",
         description: error.message,
         variant: "destructive",
       });
-    }
-  };
-
-  const removeRole = async (roleId: string) => {
-    try {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("id", roleId);
-
-      if (error) throw error;
-
-      await fetchUserRoles();
-
-      toast({
-        title: "Role removed",
-        description: "User role has been removed successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error removing role",
-        description: error.message,
-        variant: "destructive",
-      });
+    } finally {
+      setUpdatingRoles(false);
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <LoadingSpinner size="xl" text="Loading admin panel..." />
       </div>
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => navigate("/dashboard")} variant="ghost">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Shield className="w-6 h-6 text-primary" />
-                Admin Panel
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Manage users and roles
-              </p>
-            </div>
-          </div>
+    <DashboardLayout
+      title="Admin Panel"
+      subtitle="Manage users and their roles"
+      icon={<Shield className="w-8 h-8 text-primary" />}
+    >
+      {/* Search and Actions */}
+      <div className="mb-6 flex gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by email, name, or role..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
-      </header>
+        <Button onClick={loadUsers} variant="outline">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Assign Role Card */}
-          <Card className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <UserPlus className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Assign Role</h3>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Select User
-                </label>
-                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a user" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.full_name || user.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Select Role
-                </label>
-                <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="architect">Architect</SelectItem>
-                    <SelectItem value="reviewer">Reviewer</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="business_user">Business User</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                onClick={assignRole}
-                disabled={!selectedUserId}
-                className="w-full bg-gradient-primary"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Assign Role
-              </Button>
-            </div>
-          </Card>
-
-          {/* Stats Card */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">System Overview</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Users:</span>
-                <span className="font-semibold">{users.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Roles Assigned:</span>
-                <span className="font-semibold">{userRoles.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Architects:</span>
-                <span className="font-semibold">
-                  {userRoles.filter((r) => r.role === "architect").length}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Reviewers:</span>
-                <span className="font-semibold">
-                  {userRoles.filter((r) => r.role === "reviewer").length}
-                </span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* User Roles Table */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">User Roles</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Assigned Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {userRoles.map((userRole) => {
-                const user = users.find((u) => u.id === userRole.user_id);
-                return (
-                  <TableRow key={userRole.id}>
-                    <TableCell className="font-medium">
-                      {user?.full_name || "Unknown"}
-                    </TableCell>
-                    <TableCell>{user?.email || "-"}</TableCell>
-                    <TableCell>
-                      <Badge>{userRole.role}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(userRole.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={() => removeRole(userRole.id)}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card className="p-4">
+          <div className="text-sm text-muted-foreground">Total Users</div>
+          <div className="text-2xl font-bold">{users.length}</div>
         </Card>
-      </main>
-    </div>
+        <Card className="p-4">
+          <div className="text-sm text-muted-foreground">Administrators</div>
+          <div className="text-2xl font-bold">
+            {users.filter((u) => u.roles.includes("admin")).length}
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-sm text-muted-foreground">Managers</div>
+          <div className="text-2xl font-bold">
+            {
+              users.filter((u) =>
+                u.roles.some((r) => r.includes("manager"))
+              ).length
+            }
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-sm text-muted-foreground">Employees</div>
+          <div className="text-2xl font-bold">
+            {users.filter((u) => u.roles.includes("employee")).length}
+          </div>
+        </Card>
+      </div>
+
+      {/* Users Table */}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Full Name</TableHead>
+              <TableHead>Roles</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredUsers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    {searchQuery ? "No users found" : "No users yet"}
+                  </p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.email}</TableCell>
+                  <TableCell>{user.full_name}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {user.roles.length === 0 ? (
+                        <Badge variant="outline">No roles</Badge>
+                      ) : (
+                        user.roles.map((role) => (
+                          <Badge
+                            key={role}
+                            variant={role === "admin" ? "default" : "secondary"}
+                          >
+                            {AVAILABLE_ROLES.find((r) => r.value === role)
+                              ?.label || role}
+                          </Badge>
+                        ))
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(user.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      onClick={() => openRoleDialog(user)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Manage Roles
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+
+      {/* Role Management Dialog */}
+      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manage User Roles</DialogTitle>
+            <DialogDescription>
+              Update roles for {selectedUser?.email}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {AVAILABLE_ROLES.map((role) => (
+              <div key={role.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={role.value}
+                  checked={selectedRoles.includes(role.value)}
+                  onCheckedChange={() => handleRoleToggle(role.value)}
+                />
+                <Label
+                  htmlFor={role.value}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {role.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowRoleDialog(false)}
+              disabled={updatingRoles}
+            >
+              Cancel
+            </Button>
+            <Button onClick={updateUserRoles} disabled={updatingRoles}>
+              {updatingRoles ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Updating...
+                </>
+              ) : (
+                "Update Roles"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </DashboardLayout>
   );
 };
 
