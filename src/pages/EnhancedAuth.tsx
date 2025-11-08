@@ -10,8 +10,9 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Lock, LogIn, UserPlus, Chrome } from "lucide-react";
+import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BusinessSetupForm } from "@/components/BusinessSetupForm";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -29,6 +30,7 @@ const EnhancedAuth = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"email_link" | "email_password" | "google">("email_password");
+  const [showBusinessSetup, setShowBusinessSetup] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -173,10 +175,21 @@ const EnhancedAuth = () => {
         });
       }
 
-      toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account",
-      });
+      // Check if business setup is needed based on role
+      const needsBusinessSetup = ["hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin"].includes(data.role);
+      
+      if (needsBusinessSetup) {
+        setShowBusinessSetup(true);
+        toast({
+          title: "Account created!",
+          description: "Let's set up your business information",
+        });
+      } else {
+        toast({
+          title: "Account created!",
+          description: "Please check your email to verify your account",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Signup failed",
@@ -187,6 +200,28 @@ const EnhancedAuth = () => {
       setLoading(false);
     }
   };
+
+  if (showBusinessSetup) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle p-4">
+        <div className="container max-w-4xl mx-auto">
+          <div className="mb-6">
+            <Button onClick={() => setShowBusinessSetup(false)} variant="ghost">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Login
+            </Button>
+          </div>
+          <BusinessSetupForm onComplete={() => {
+            toast({
+              title: "Setup complete!",
+              description: "Please check your email to verify your account",
+            });
+            setShowBusinessSetup(false);
+          }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
