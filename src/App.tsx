@@ -13,6 +13,11 @@ import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import FloorPlanner from "./pages/FloorPlanner";
 import AdminPanel from "./pages/AdminPanel";
+import EnhancedAuth from "./pages/EnhancedAuth";
+import HRDashboard from "./pages/HRDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import ProfileSettings from "./pages/ProfileSettings";
+import Onboarding from "./pages/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -24,8 +29,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={<EnhancedAuth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/hr-dashboard" element={<HRDashboard />} />
+          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+          <Route path="/profile-settings" element={<ProfileSettings />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/jobs" element={<JobSeeker />} />
           <Route path="/floor-planner" element={<FloorPlanner />} />

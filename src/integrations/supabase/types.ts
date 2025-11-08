@@ -479,6 +479,36 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_steps: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          skipped: boolean | null
+          step_name: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          skipped?: boolean | null
+          step_name: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          skipped?: boolean | null
+          step_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_type: string | null
@@ -487,6 +517,10 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          login_method: string | null
+          onboarding_completed: boolean | null
+          preferences: Json | null
+          role: string | null
           updated_at: string | null
         }
         Insert: {
@@ -496,6 +530,10 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          login_method?: string | null
+          onboarding_completed?: boolean | null
+          preferences?: Json | null
+          role?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -505,7 +543,35 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          login_method?: string | null
+          onboarding_completed?: boolean | null
+          preferences?: Json | null
+          role?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_auth_methods: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_primary: boolean | null
+          method: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          method: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          method?: string
+          user_id?: string
         }
         Relationships: []
       }
