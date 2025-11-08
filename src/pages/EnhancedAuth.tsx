@@ -18,13 +18,39 @@ const loginSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
 });
 
-const signupSchema = z.object({
-  email: z.string().email("Invalid email address").max(255),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  role: z.enum(["employee", "hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin", "architect", "home_builder"]),
-  loginMethod: z.enum(["email_link", "email_password", "google"]),
-});
+const signupSchema = z
+  .object({
+    email: z.string().email("Invalid email address").max(255),
+    // Password is only required when using email & password
+    password: z.string().min(8, "Password must be at least 8 characters").optional(),
+    fullName: z
+      .string()
+      .min(2, "Name must be at least 2 characters")
+      .max(100),
+    role: z.enum([
+      "employee",
+      "hr_manager",
+      "finance_manager",
+      "procurement_manager",
+      "sales_manager",
+      "executive",
+      "admin",
+      "architect",
+      "home_builder",
+    ]),
+    loginMethod: z.enum(["email_link", "email_password", "google"]),
+  })
+  .superRefine((val, ctx) => {
+    if (val.loginMethod === "email_password") {
+      if (!val.password || val.password.length < 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["password"],
+          message: "Password must be at least 8 characters",
+        });
+      }
+    }
+  });
 
 const EnhancedAuth = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -167,71 +193,102 @@ const EnhancedAuth = () => {
     }
   };
 
-  const handleSignup = async (data: z.infer<typeof signupSchema>) => {
-    try {
-      setLoading(true);
+const handleSignup = async (data: z.infer<typeof signupSchema>) => {
+  try {
+    setLoading(true);
 
-      if (data.loginMethod === "google") {
-        await handleGoogleLogin();
-        return;
-      }
+    // Handle provider-specific signups
+    if (data.loginMethod === "google") {
+      await handleGoogleLogin();
+      return;
+    }
 
-      const { data: authData, error } = await supabase.auth.signUp({
+    if (data.loginMethod === "email_link") {
+      // Send a magic link for passwordless sign up
+      const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
-        password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/onboarding`,
-          data: {
-            full_name: data.fullName,
-            role: data.role,
-            login_method: data.loginMethod,
-          },
         },
       });
 
       if (error) throw error;
 
-      // Insert user role and auth method
-      if (authData.user) {
-        // Insert role into user_roles table
-        await supabase.from("user_roles").insert([{
-          user_id: authData.user.id,
-          role: data.role as any,
-        }]);
-
-        // Track auth method
-        await supabase.from("user_auth_methods").insert([{
-          user_id: authData.user.id,
-          method: data.loginMethod,
-          is_primary: true,
-        }]);
-      }
-
-      // Check if business setup is needed based on role
-      const needsBusinessSetup = ["hr_manager", "finance_manager", "procurement_manager", "sales_manager", "executive", "admin", "architect", "home_builder"].includes(data.role);
-      
-      if (needsBusinessSetup) {
-        setShowBusinessSetup(true);
-        toast({
-          title: "Account created!",
-          description: "Let's set up your business information",
-        });
-      } else {
-        toast({
-          title: "Account created!",
-          description: "Please check your email to verify your account",
-        });
-      }
-    } catch (error: any) {
       toast({
-        title: "Signup failed",
-        description: error.message,
-        variant: "destructive",
+        title: "Check your email",
+        description:
+          "We've sent you a sign-in link to finish creating your account.",
       });
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    // Email & password signup
+    const { data: authData, error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password!,
+      options: {
+        emailRedirectTo: `${window.location.origin}/onboarding`,
+        data: {
+          full_name: data.fullName,
+          preferred_role: data.role,
+          login_method: data.loginMethod,
+        },
+      },
+    });
+
+    if (error) throw error;
+
+    // Only attempt DB writes if we have an authenticated session (auto-confirm enabled)
+    if (authData.session?.user) {
+      try {
+        await supabase.from("user_auth_methods").insert([
+          {
+            user_id: authData.session.user.id,
+            method: data.loginMethod,
+            is_primary: true,
+          },
+        ]);
+      } catch {
+        // Non-fatal during sign up
+      }
+
+      // IMPORTANT: Roles are managed securely by admins/backend functions.
+      // Do not insert into user_roles from the client at signup time.
+    }
+
+    const needsBusinessSetup = [
+      "hr_manager",
+      "finance_manager",
+      "procurement_manager",
+      "sales_manager",
+      "executive",
+      "admin",
+      "architect",
+      "home_builder",
+    ].includes(data.role);
+
+    if (needsBusinessSetup && authData.session?.user) {
+      setShowBusinessSetup(true);
+      toast({
+        title: "Account created!",
+        description: "Let's set up your business information",
+      });
+    } else {
+      toast({
+        title: "Account created!",
+        description: "Please check your email to verify your account",
+      });
+    }
+  } catch (error: any) {
+    toast({
+      title: "Signup failed",
+      description: error.message,
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (showBusinessSetup) {
     return (
