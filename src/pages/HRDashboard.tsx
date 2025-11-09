@@ -10,6 +10,12 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { HRMetricsChart } from "@/components/dashboard/HRMetricsChart";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import HildaChat from "@/components/HildaChat";
+import EmployeeManagement from "@/components/hr/EmployeeManagement";
+import LeaveManagement from "@/components/hr/LeaveManagement";
+import PerformanceReviews from "@/components/hr/PerformanceReviews";
+import OnboardingWorkflow from "@/components/hr/OnboardingWorkflow";
 
 const hrModules = [
   { name: "advanced_recruitment", displayName: "Advanced Recruitment", description: "AI-powered candidate screening and matching", category: "Recruitment" },
@@ -23,6 +29,12 @@ const HRDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showHildaChat, setShowHildaChat] = useState(false);
+  const [hildaServiceType, setHildaServiceType] = useState("");
+  const [showEmployeeManagement, setShowEmployeeManagement] = useState(false);
+  const [showLeaveManagement, setShowLeaveManagement] = useState(false);
+  const [showPerformanceReviews, setShowPerformanceReviews] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -137,7 +149,7 @@ const HRDashboard = () => {
             title="Employee Management"
             description="View and manage employee records"
             icon={Users}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowEmployeeManagement(true)}
             colorScheme="secondary"
             delay={100}
           />
@@ -145,7 +157,7 @@ const HRDashboard = () => {
             title="Leave Management"
             description="Review and approve leave requests"
             icon={Calendar}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowLeaveManagement(true)}
             colorScheme="success"
             delay={200}
           />
@@ -153,7 +165,7 @@ const HRDashboard = () => {
             title="Performance Reviews"
             description="Conduct and track performance evaluations"
             icon={Award}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowPerformanceReviews(true)}
             colorScheme="warning"
             delay={300}
           />
@@ -161,7 +173,7 @@ const HRDashboard = () => {
             title="Onboarding Workflows"
             description="Set up new hire onboarding processes"
             icon={UserPlus}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowOnboarding(true)}
             colorScheme="primary"
             delay={400}
           />
@@ -169,7 +181,7 @@ const HRDashboard = () => {
             title="Reports & Analytics"
             description="View HR metrics and insights"
             icon={FileText}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setHildaServiceType("analytics"); setShowHildaChat(true); }}
             colorScheme="secondary"
             delay={500}
           />
@@ -213,6 +225,50 @@ const HRDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
         <FeatureModulesPanel roleModules={hrModules} />
       </div>
+
+      {/* Feature Dialogs */}
+      <Dialog open={showEmployeeManagement} onOpenChange={setShowEmployeeManagement}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Employee Management</DialogTitle>
+          </DialogHeader>
+          <EmployeeManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showLeaveManagement} onOpenChange={setShowLeaveManagement}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Leave Management</DialogTitle>
+          </DialogHeader>
+          <LeaveManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPerformanceReviews} onOpenChange={setShowPerformanceReviews}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Performance Reviews</DialogTitle>
+          </DialogHeader>
+          <PerformanceReviews />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Onboarding Workflow</DialogTitle>
+          </DialogHeader>
+          <OnboardingWorkflow />
+        </DialogContent>
+      </Dialog>
+
+      {showHildaChat && (
+        <HildaChat 
+          onClose={() => setShowHildaChat(false)}
+          serviceType={hildaServiceType}
+        />
+      )}
     </DashboardLayout>
   );
 };

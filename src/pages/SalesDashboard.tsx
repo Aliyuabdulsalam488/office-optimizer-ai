@@ -11,6 +11,12 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { SalesPipelineChart } from "@/components/dashboard/SalesPipelineChart";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import SallyChat from "@/components/SallyChat";
+import LeadManagement from "@/components/sales/LeadManagement";
+import PipelineTracking from "@/components/sales/PipelineTracking";
+import QuoteGenerator from "@/components/sales/QuoteGenerator";
+import SalesForecasting from "@/components/sales/SalesForecasting";
 
 const salesModules = [
   { name: "lead_scoring", displayName: "AI Lead Scoring", description: "Automatically score and prioritize leads", category: "Leads" },
@@ -24,6 +30,12 @@ const SalesDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showSallyChat, setShowSallyChat] = useState(false);
+  const [sallyServiceType, setSallyServiceType] = useState("");
+  const [showLeadManagement, setShowLeadManagement] = useState(false);
+  const [showPipelineTracking, setShowPipelineTracking] = useState(false);
+  const [showQuoteGenerator, setShowQuoteGenerator] = useState(false);
+  const [showSalesForecasting, setShowSalesForecasting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -184,7 +196,7 @@ const SalesDashboard = () => {
             title="Lead Management"
             description="Track and nurture sales leads"
             icon={Users}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowLeadManagement(true)}
             colorScheme="primary"
             delay={0}
           />
@@ -192,7 +204,7 @@ const SalesDashboard = () => {
             title="Pipeline Tracking"
             description="Monitor deals through sales stages"
             icon={TrendingUp}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowPipelineTracking(true)}
             colorScheme="secondary"
             delay={100}
           />
@@ -200,7 +212,7 @@ const SalesDashboard = () => {
             title="Quote Generator"
             description="Create professional quotes quickly"
             icon={DollarSign}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowQuoteGenerator(true)}
             colorScheme="success"
             delay={200}
           />
@@ -208,7 +220,7 @@ const SalesDashboard = () => {
             title="Sales Forecasting"
             description="Predict future revenue trends"
             icon={Target}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowSalesForecasting(true)}
             colorScheme="warning"
             delay={300}
           />
@@ -216,7 +228,7 @@ const SalesDashboard = () => {
             title="Email Campaigns"
             description="Manage sales email sequences"
             icon={Mail}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setSallyServiceType("email_campaigns"); setShowSallyChat(true); }}
             colorScheme="primary"
             delay={400}
           />
@@ -224,7 +236,7 @@ const SalesDashboard = () => {
             title="Call Scheduler"
             description="Schedule and track sales calls"
             icon={Phone}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setSallyServiceType("call_scheduler"); setShowSallyChat(true); }}
             colorScheme="secondary"
             delay={500}
           />
@@ -242,6 +254,50 @@ const SalesDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
         <FeatureModulesPanel roleModules={salesModules} />
       </div>
+
+      {/* Feature Dialogs */}
+      <Dialog open={showLeadManagement} onOpenChange={setShowLeadManagement}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Lead Management</DialogTitle>
+          </DialogHeader>
+          <LeadManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPipelineTracking} onOpenChange={setShowPipelineTracking}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Pipeline Tracking</DialogTitle>
+          </DialogHeader>
+          <PipelineTracking />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showQuoteGenerator} onOpenChange={setShowQuoteGenerator}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Quote Generator</DialogTitle>
+          </DialogHeader>
+          <QuoteGenerator />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSalesForecasting} onOpenChange={setShowSalesForecasting}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Sales Forecasting</DialogTitle>
+          </DialogHeader>
+          <SalesForecasting />
+        </DialogContent>
+      </Dialog>
+
+      {showSallyChat && (
+        <SallyChat 
+          onClose={() => setShowSallyChat(false)}
+          serviceType={sallyServiceType}
+        />
+      )}
     </DashboardLayout>
   );
 };

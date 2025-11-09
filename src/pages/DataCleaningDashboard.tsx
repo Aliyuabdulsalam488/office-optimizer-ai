@@ -12,6 +12,13 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { DataQualityChart } from "@/components/dashboard/DataQualityChart";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ClaraChat from "@/components/ClaraChat";
+import DataProfiling from "@/components/datacleaning/DataProfiling";
+import DuplicateDetection from "@/components/datacleaning/DuplicateDetection";
+import ValidationRules from "@/components/datacleaning/ValidationRules";
+import DataTransformation from "@/components/datacleaning/DataTransformation";
+import DataQualityAssessment from "@/components/datacleaning/DataQualityAssessment";
 
 const dataCleaningModules = [
   { name: "ai_data_profiling", displayName: "AI Data Profiling", description: "Automatic data quality assessment and profiling", category: "Analysis" },
@@ -25,6 +32,13 @@ const DataCleaningDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showClaraChat, setShowClaraChat] = useState(false);
+  const [claraServiceType, setClaraServiceType] = useState("");
+  const [showDataProfiling, setShowDataProfiling] = useState(false);
+  const [showDuplicateDetection, setShowDuplicateDetection] = useState(false);
+  const [showValidationRules, setShowValidationRules] = useState(false);
+  const [showDataTransformation, setShowDataTransformation] = useState(false);
+  const [showQualityAssessment, setShowQualityAssessment] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -187,7 +201,7 @@ const DataCleaningDashboard = () => {
             title="Data Profiling"
             description="Analyze data structure and quality"
             icon={FileText}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowDataProfiling(true)}
             colorScheme="primary"
             delay={0}
           />
@@ -195,7 +209,7 @@ const DataCleaningDashboard = () => {
             title="Duplicate Detection"
             description="Find and merge duplicate records"
             icon={GitMerge}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowDuplicateDetection(true)}
             colorScheme="secondary"
             delay={100}
           />
@@ -203,7 +217,7 @@ const DataCleaningDashboard = () => {
             title="Validation Rules"
             description="Define data quality rules"
             icon={CheckCircle}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowValidationRules(true)}
             colorScheme="success"
             delay={200}
           />
@@ -211,7 +225,7 @@ const DataCleaningDashboard = () => {
             title="Data Transformation"
             description="Clean and standardize data"
             icon={Layers}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowDataTransformation(true)}
             colorScheme="warning"
             delay={300}
           />
@@ -219,7 +233,7 @@ const DataCleaningDashboard = () => {
             title="Filter & Sort"
             description="Apply advanced data filters"
             icon={Filter}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setClaraServiceType("filter_sort"); setShowClaraChat(true); }}
             colorScheme="primary"
             delay={400}
           />
@@ -227,7 +241,7 @@ const DataCleaningDashboard = () => {
             title="Quality Assessment"
             description="Run comprehensive quality checks"
             icon={TrendingUp}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => setShowQualityAssessment(true)}
             colorScheme="secondary"
             delay={500}
           />
@@ -245,6 +259,59 @@ const DataCleaningDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
         <FeatureModulesPanel roleModules={dataCleaningModules} />
       </div>
+
+      {/* Feature Dialogs */}
+      <Dialog open={showDataProfiling} onOpenChange={setShowDataProfiling}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Data Profiling</DialogTitle>
+          </DialogHeader>
+          <DataProfiling />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDuplicateDetection} onOpenChange={setShowDuplicateDetection}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Duplicate Detection</DialogTitle>
+          </DialogHeader>
+          <DuplicateDetection />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showValidationRules} onOpenChange={setShowValidationRules}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Validation Rules</DialogTitle>
+          </DialogHeader>
+          <ValidationRules />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDataTransformation} onOpenChange={setShowDataTransformation}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Data Transformation</DialogTitle>
+          </DialogHeader>
+          <DataTransformation />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showQualityAssessment} onOpenChange={setShowQualityAssessment}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Quality Assessment</DialogTitle>
+          </DialogHeader>
+          <DataQualityAssessment />
+        </DialogContent>
+      </Dialog>
+
+      {showClaraChat && (
+        <ClaraChat 
+          onClose={() => setShowClaraChat(false)}
+          serviceType={claraServiceType}
+        />
+      )}
     </DashboardLayout>
   );
 };

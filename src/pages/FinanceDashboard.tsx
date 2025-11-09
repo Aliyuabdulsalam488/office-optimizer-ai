@@ -11,6 +11,8 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Progress } from "@/components/ui/progress";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import FreddyChat from "@/components/FreddyChat";
 
 const financeModules = [
   { name: "advanced_reporting", displayName: "Advanced Reporting", description: "Generate detailed financial reports and analytics", category: "Reporting" },
@@ -24,6 +26,8 @@ const FinanceDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showFreddyChat, setShowFreddyChat] = useState(false);
+  const [freddyServiceType, setFreddyServiceType] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -188,7 +192,7 @@ const FinanceDashboard = () => {
             title="Invoice Management"
             description="Create, track and manage invoices"
             icon={FileText}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("invoice_management"); setShowFreddyChat(true); }}
             colorScheme="primary"
             delay={0}
           />
@@ -196,7 +200,7 @@ const FinanceDashboard = () => {
             title="Expense Tracking"
             description="Monitor and categorize expenses"
             icon={CreditCard}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("expense_tracking"); setShowFreddyChat(true); }}
             colorScheme="secondary"
             delay={100}
           />
@@ -204,7 +208,7 @@ const FinanceDashboard = () => {
             title="Financial Reports"
             description="Generate detailed financial reports"
             icon={BarChart3}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("financial_reports"); setShowFreddyChat(true); }}
             colorScheme="success"
             delay={200}
           />
@@ -212,7 +216,7 @@ const FinanceDashboard = () => {
             title="Budget Planning"
             description="Create and manage budgets"
             icon={PieChart}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("budget_planning"); setShowFreddyChat(true); }}
             colorScheme="warning"
             delay={300}
           />
@@ -220,7 +224,7 @@ const FinanceDashboard = () => {
             title="Cash Flow Analysis"
             description="Analyze cash flow patterns"
             icon={TrendingUp}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("cash_flow"); setShowFreddyChat(true); }}
             colorScheme="primary"
             delay={400}
           />
@@ -228,7 +232,7 @@ const FinanceDashboard = () => {
             title="Tax Management"
             description="Track tax obligations and filings"
             icon={DollarSign}
-            onClick={() => toast({ title: "Coming soon" })}
+            onClick={() => { setFreddyServiceType("tax_management"); setShowFreddyChat(true); }}
             colorScheme="secondary"
             delay={500}
           />
@@ -246,6 +250,14 @@ const FinanceDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Enable Additional Features</h2>
         <FeatureModulesPanel roleModules={financeModules} />
       </div>
+
+      {/* Freddy Chat Dialog */}
+      {showFreddyChat && (
+        <FreddyChat 
+          onClose={() => setShowFreddyChat(false)}
+          serviceType={freddyServiceType}
+        />
+      )}
     </DashboardLayout>
   );
 };

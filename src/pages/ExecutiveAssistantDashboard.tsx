@@ -6,11 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, CheckSquare, Mail, Settings, LogOut, Briefcase, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import EvaChat from "@/components/EvaChat";
+import CalendarManagement from "@/components/executive/CalendarManagement";
+import TravelPlanning from "@/components/executive/TravelPlanning";
+import ExpenseTracking from "@/components/executive/ExpenseTracking";
+import TaskManagement from "@/components/executive/TaskManagement";
 
 const ExecutiveAssistantDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showEvaChat, setShowEvaChat] = useState(false);
+  const [evaServiceType, setEvaServiceType] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showTravel, setShowTravel] = useState(false);
+  const [showExpense, setShowExpense] = useState(false);
+  const [showTasks, setShowTasks] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -170,19 +182,19 @@ const ExecutiveAssistantDashboard = () => {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-3">
-              <Button variant="outline" className="justify-start">
+              <Button variant="outline" className="justify-start" onClick={() => setShowCalendar(true)}>
                 <Calendar className="w-4 h-4 mr-2" />
                 Schedule Meeting
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button variant="outline" className="justify-start" onClick={() => setShowTravel(true)}>
                 <Clock className="w-4 h-4 mr-2" />
                 Plan Travel
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button variant="outline" className="justify-start" onClick={() => setShowExpense(true)}>
                 <Mail className="w-4 h-4 mr-2" />
                 Submit Expense
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button variant="outline" className="justify-start" onClick={() => setShowTasks(true)}>
                 <CheckSquare className="w-4 h-4 mr-2" />
                 Manage Tasks
               </Button>
@@ -210,6 +222,50 @@ const ExecutiveAssistantDashboard = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* Feature Dialogs */}
+      <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Calendar Management</DialogTitle>
+          </DialogHeader>
+          <CalendarManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showTravel} onOpenChange={setShowTravel}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Travel Planning</DialogTitle>
+          </DialogHeader>
+          <TravelPlanning />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showExpense} onOpenChange={setShowExpense}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Expense Tracking</DialogTitle>
+          </DialogHeader>
+          <ExpenseTracking />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showTasks} onOpenChange={setShowTasks}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Task Management</DialogTitle>
+          </DialogHeader>
+          <TaskManagement />
+        </DialogContent>
+      </Dialog>
+
+      {showEvaChat && (
+        <EvaChat 
+          onClose={() => setShowEvaChat(false)}
+          serviceType={evaServiceType}
+        />
+      )}
     </div>
   );
 };

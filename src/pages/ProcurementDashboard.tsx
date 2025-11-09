@@ -7,11 +7,25 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { StatCard } from "@/components/ui/stat-card";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import PennyChat from "@/components/PennyChat";
+import PurchaseRequisition from "@/components/procurement/PurchaseRequisition";
+import SupplierManagement from "@/components/procurement/SupplierManagement";
+import SpendAnalytics from "@/components/procurement/SpendAnalytics";
+import ContractManagement from "@/components/procurement/ContractManagement";
+import RFQGenerator from "@/components/procurement/RFQGenerator";
 
 const ProcurementDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showPennyChat, setShowPennyChat] = useState(false);
+  const [pennyServiceType, setPennyServiceType] = useState("");
+  const [showPurchaseReq, setShowPurchaseReq] = useState(false);
+  const [showSupplierMgmt, setShowSupplierMgmt] = useState(false);
+  const [showSpendAnalytics, setShowSpendAnalytics] = useState(false);
+  const [showContractMgmt, setShowContractMgmt] = useState(false);
+  const [showRFQMgmt, setShowRFQMgmt] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -88,14 +102,67 @@ const ProcurementDashboard = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <QuickActionCard title="Create Purchase Order" description="Generate new PO documents" icon={FileText} onClick={() => toast({ title: "Coming soon" })} colorScheme="primary" delay={0} />
-          <QuickActionCard title="Manage Vendors" description="View and update supplier info" icon={Users} onClick={() => toast({ title: "Coming soon" })} colorScheme="secondary" delay={100} />
-          <QuickActionCard title="Spend Analytics" description="Analyze spending patterns" icon={BarChart3} onClick={() => toast({ title: "Coming soon" })} colorScheme="success" delay={200} />
-          <QuickActionCard title="Track Deliveries" description="Monitor shipment status" icon={Package} onClick={() => toast({ title: "Coming soon" })} colorScheme="warning" delay={300} />
-          <QuickActionCard title="Contract Management" description="Manage vendor contracts" icon={CheckCircle} onClick={() => toast({ title: "Coming soon" })} colorScheme="primary" delay={400} />
-          <QuickActionCard title="RFQ Management" description="Request for quotations" icon={Clock} onClick={() => toast({ title: "Coming soon" })} colorScheme="secondary" delay={500} />
+          <QuickActionCard title="Create Purchase Order" description="Generate new PO documents" icon={FileText} onClick={() => setShowPurchaseReq(true)} colorScheme="primary" delay={0} />
+          <QuickActionCard title="Manage Vendors" description="View and update supplier info" icon={Users} onClick={() => setShowSupplierMgmt(true)} colorScheme="secondary" delay={100} />
+          <QuickActionCard title="Spend Analytics" description="Analyze spending patterns" icon={BarChart3} onClick={() => setShowSpendAnalytics(true)} colorScheme="success" delay={200} />
+          <QuickActionCard title="Track Deliveries" description="Monitor shipment status" icon={Package} onClick={() => { setPennyServiceType("track_deliveries"); setShowPennyChat(true); }} colorScheme="warning" delay={300} />
+          <QuickActionCard title="Contract Management" description="Manage vendor contracts" icon={CheckCircle} onClick={() => setShowContractMgmt(true)} colorScheme="primary" delay={400} />
+          <QuickActionCard title="RFQ Management" description="Request for quotations" icon={Clock} onClick={() => setShowRFQMgmt(true)} colorScheme="secondary" delay={500} />
         </div>
       </div>
+
+      {/* Feature Dialogs */}
+      <Dialog open={showPurchaseReq} onOpenChange={setShowPurchaseReq}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Purchase Requisition</DialogTitle>
+          </DialogHeader>
+          <PurchaseRequisition />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSupplierMgmt} onOpenChange={setShowSupplierMgmt}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Supplier Management</DialogTitle>
+          </DialogHeader>
+          <SupplierManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSpendAnalytics} onOpenChange={setShowSpendAnalytics}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Spend Analytics</DialogTitle>
+          </DialogHeader>
+          <SpendAnalytics />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showContractMgmt} onOpenChange={setShowContractMgmt}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Contract Management</DialogTitle>
+          </DialogHeader>
+          <ContractManagement />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRFQMgmt} onOpenChange={setShowRFQMgmt}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>RFQ Management</DialogTitle>
+          </DialogHeader>
+          <RFQGenerator />
+        </DialogContent>
+      </Dialog>
+
+      {showPennyChat && (
+        <PennyChat 
+          onClose={() => setShowPennyChat(false)}
+          serviceType={pennyServiceType}
+        />
+      )}
     </DashboardLayout>
   );
 };
