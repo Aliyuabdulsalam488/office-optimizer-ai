@@ -19,8 +19,8 @@ const Services = () => {
     },
     {
       icon: Home,
-      title: "Architecture & Spatial Solver",
-      description: "Optimize physical layouts based on constraints. Generate floor plan concepts, material recommendations, and compliance reports.",
+      title: "Architect Solution",
+      description: "Two-round iterative architectural peer review system. AI-powered compliance checking, space optimization, and detailed efficiency metrics for residential design.",
       route: "/floor-planner"
     }
   ];

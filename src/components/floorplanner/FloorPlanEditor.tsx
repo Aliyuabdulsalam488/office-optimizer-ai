@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save, Sparkles, CheckCircle, Box, Download, DollarSign, MessageSquare } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, CheckCircle, Box, Download, DollarSign, MessageSquare, FileText, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Canvas as FabricCanvas, Rect, Circle, Line } from "fabric";
 import FloorPlanCanvas from "./FloorPlanCanvas";
@@ -13,7 +13,9 @@ import FloorPlan3DViewer from "./FloorPlan3DViewer";
 import ExportPanel from "./ExportPanel";
 import CostEstimator from "./CostEstimator";
 import CollaborationPanel from "./CollaborationPanel";
+import ArchitecturalAnalysis from "./ArchitecturalAnalysis";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useNavigate } from "react-router-dom";
 
 interface FloorPlanEditorProps {
   planId: string;
@@ -26,6 +28,7 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
   const [saving, setSaving] = useState(false);
   const [canvas, setCanvas] = useState<FabricCanvas | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPlan();
@@ -117,6 +120,10 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
+              <Button onClick={() => navigate('/')} variant="ghost" size="sm">
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
               <div>
                 <h1 className="text-xl font-bold">{plan?.title}</h1>
                 <p className="text-sm text-muted-foreground">{plan?.description}</p>
@@ -134,6 +141,10 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
         <Tabs defaultValue="editor" className="w-full">
           <TabsList className="mb-6 flex-wrap h-auto">
             <TabsTrigger value="editor">Floor Editor</TabsTrigger>
+            <TabsTrigger value="architectural-analysis">
+              <FileText className="w-4 h-4 mr-2" />
+              Architectural Analysis
+            </TabsTrigger>
             <TabsTrigger value="3d-view">
               <Box className="w-4 h-4 mr-2" />
               3D View
@@ -164,6 +175,14 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
             <FloorPlanCanvas
               planId={planId}
               onCanvasReady={setCanvas}
+            />
+          </TabsContent>
+
+          <TabsContent value="architectural-analysis">
+            <ArchitecturalAnalysis
+              planId={planId}
+              canvas={canvas}
+              planData={plan}
             />
           </TabsContent>
 

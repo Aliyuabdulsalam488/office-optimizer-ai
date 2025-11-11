@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { planId, planData, prompt, action, canvasData } = await req.json();
+    const { planId, planData, prompt, action, canvasData, floorPlanData, systemPrompt: customSystemPrompt, userPrompt: customUserPrompt } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
@@ -62,6 +62,10 @@ For each issue, provide:
 ${JSON.stringify(canvasData)}
 
 Identify and categorize any problems with the layout:`;
+    } else if (action === 'architectural-analysis') {
+      // Use custom prompts provided by the client for architectural analysis
+      systemPrompt = customSystemPrompt || systemPrompt;
+      userPrompt = customUserPrompt || userPrompt;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -137,6 +141,11 @@ Identify and categorize any problems with the layout:`;
 
       return new Response(
         JSON.stringify({ issues, suggestions: aiResponse }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } else if (action === 'architectural-analysis') {
+      return new Response(
+        JSON.stringify({ report: aiResponse }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

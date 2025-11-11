@@ -37,45 +37,24 @@ const FinanceDashboard = () => {
 
   const checkAuth = async () => {
     try {
+      // Allow direct access without authentication
+      setLoading(false);
+      
+      // Optionally check if user is logged in for enhanced features
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        navigate("/auth");
-        return;
+      if (user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        setUser(user);
+        setProfile(profileData);
       }
-
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const { data: userRoles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-
-      const hasFinanceRole = userRoles?.some(r => r.role.toString() === "finance_manager");
-
-      if (!hasFinanceRole) {
-        toast({
-          title: "Access denied",
-          description: "This dashboard is for Finance Managers only",
-          variant: "destructive",
-        });
-        navigate("/employee-dashboard");
-        return;
-      }
-
-      setUser(user);
-      setProfile(profileData);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
+      console.log('Auth check error:', error);
       setLoading(false);
     }
   };

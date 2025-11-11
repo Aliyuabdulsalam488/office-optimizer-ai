@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RecruitmentTracking from "@/components/hr/RecruitmentTracking";
-import { LogOut } from "lucide-react";
+import { LogOut, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Recruitment = () => {
@@ -14,20 +14,13 @@ const Recruitment = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        navigate("/auth");
-      } else {
-        setLoading(false);
-      }
-    });
+    // Allow direct access without authentication
+    setLoading(false);
 
-    // Listen for auth changes
+    // Listen for auth changes (optional)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      }
+      // Just log the event, don't redirect
+      console.log('Auth state changed:', event);
     });
 
     return () => subscription.unsubscribe();
@@ -62,10 +55,16 @@ const Recruitment = () => {
               Manage job postings, applications, and interviews
             </p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => navigate('/')}>
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <Card className="border-none shadow-lg">

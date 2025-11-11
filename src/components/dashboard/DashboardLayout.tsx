@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Settings, LogOut, Menu } from "lucide-react";
+import { Settings, LogOut, Menu, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -61,6 +61,15 @@ export const DashboardLayout = ({
             </div>
 
             <div className="flex items-center gap-2">
+              <Button
+                onClick={() => navigate("/")}
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
               <Button
                 onClick={() => navigate("/feature-settings")}
                 variant="ghost"

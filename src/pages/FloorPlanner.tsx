@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FloorPlanList from "@/components/floorplanner/FloorPlanList";
 import CreateFloorPlan from "@/components/floorplanner/CreateFloorPlan";
@@ -22,14 +22,21 @@ const FloorPlanner = () => {
     checkAuth();
   }, []);
 
+  const handleHomeNavigation = () => {
+    navigate('/');
+  };
+
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
+    
+    // Allow access without login - set default architect role
     if (!user) {
-      navigate("/auth");
+      setUserRole('architect');
+      setLoading(false);
       return;
     }
 
-    // Check user role
+    // Check user role if logged in
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
@@ -38,6 +45,8 @@ const FloorPlanner = () => {
 
     if (roleData) {
       setUserRole(roleData.role);
+    } else {
+      setUserRole('architect');
     }
 
     setLoading(false);
@@ -53,23 +62,6 @@ const FloorPlanner = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (!userRole) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
-        <div className="text-center max-w-md p-8">
-          <h2 className="text-2xl font-bold mb-4">Access Required</h2>
-          <p className="text-muted-foreground mb-6">
-            You need to be assigned a role (Architect or Reviewer) to access the Floor Planner module.
-            Please contact your administrator.
-          </p>
-          <Button onClick={handleLogout} variant="outline">
-            Back to Login
-          </Button>
-        </div>
       </div>
     );
   }
@@ -100,12 +92,16 @@ const FloorPlanner = () => {
       <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Floor Planner</h1>
+            <h1 className="text-2xl font-bold">Architect Solution</h1>
             <p className="text-sm text-muted-foreground">
-              {userRole === 'architect' ? 'Design & Edit Floor Plans' : 'Review Floor Plans'}
+              {userRole === 'architect' ? 'Design & Edit Floor Plans with AI Analysis' : 'Review Floor Plans'}
             </p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={handleHomeNavigation} variant="ghost" size="sm">
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Button>
             {userRole === 'architect' && (
               <Button onClick={() => setShowCreate(true)} className="bg-gradient-primary">
                 <Plus className="w-4 h-4 mr-2" />
