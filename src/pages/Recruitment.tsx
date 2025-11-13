@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RecruitmentTracking from "@/components/hr/RecruitmentTracking";
-import { LogOut, Home } from "lucide-react";
+import { JobApplicationForm } from "@/components/hr/JobApplicationForm";
+import { LogOut, Home, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Recruitment = () => {
@@ -69,10 +70,14 @@ const Recruitment = () => {
 
         <Card className="border-none shadow-lg">
           <Tabs defaultValue="jobs" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="jobs">Job Postings</TabsTrigger>
               <TabsTrigger value="applications">Applications</TabsTrigger>
               <TabsTrigger value="interviews">Interviews</TabsTrigger>
+              <TabsTrigger value="freelance">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Apply as Freelancer
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="jobs" className="p-6">
@@ -85,6 +90,10 @@ const Recruitment = () => {
             
             <TabsContent value="interviews" className="p-6">
               <RecruitmentTracking view="interviews" />
+            </TabsContent>
+
+            <TabsContent value="freelance" className="p-6">
+              <JobApplicationForm />
             </TabsContent>
           </Tabs>
         </Card>

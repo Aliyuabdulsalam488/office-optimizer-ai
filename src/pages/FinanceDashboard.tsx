@@ -13,6 +13,8 @@ import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import FeatureModulesPanel from "@/components/FeatureModulesPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import FreddyChat from "@/components/FreddyChat";
+import { InvoiceGenerator } from "@/components/finance/InvoiceGenerator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const financeModules = [
   { name: "advanced_reporting", displayName: "Advanced Reporting", description: "Generate detailed financial reports and analytics", category: "Reporting" },
@@ -28,6 +30,7 @@ const FinanceDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showFreddyChat, setShowFreddyChat] = useState(false);
   const [freddyServiceType, setFreddyServiceType] = useState("");
+  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -171,7 +174,7 @@ const FinanceDashboard = () => {
             title="Invoice Management"
             description="Create, track and manage invoices"
             icon={FileText}
-            onClick={() => { setFreddyServiceType("invoice_management"); setShowFreddyChat(true); }}
+            onClick={() => setShowInvoiceGenerator(true)}
             colorScheme="primary"
             delay={0}
           />
@@ -237,6 +240,16 @@ const FinanceDashboard = () => {
           serviceType={freddyServiceType}
         />
       )}
+
+      {/* Invoice Generator Dialog */}
+      <Dialog open={showInvoiceGenerator} onOpenChange={setShowInvoiceGenerator}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Automated Invoice Generator</DialogTitle>
+          </DialogHeader>
+          <InvoiceGenerator />
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
