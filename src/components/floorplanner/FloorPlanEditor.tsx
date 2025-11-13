@@ -14,6 +14,10 @@ import ExportPanel from "./ExportPanel";
 import CostEstimator from "./CostEstimator";
 import CollaborationPanel from "./CollaborationPanel";
 import ArchitecturalAnalysis from "./ArchitecturalAnalysis";
+import { RoomLayoutOptimizer } from "./RoomLayoutOptimizer";
+import { MaterialLibrary } from "./MaterialLibrary";
+import { MeasurementTools } from "./MeasurementTools";
+import { BuildingCodeChecker } from "./BuildingCodeChecker";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useNavigate } from "react-router-dom";
 
@@ -145,6 +149,22 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
               <FileText className="w-4 h-4 mr-2" />
               Architectural Analysis
             </TabsTrigger>
+            <TabsTrigger value="layout-optimizer">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Layout Optimizer
+            </TabsTrigger>
+            <TabsTrigger value="materials">
+              <Box className="w-4 h-4 mr-2" />
+              Material Library
+            </TabsTrigger>
+            <TabsTrigger value="measurements">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Measurements
+            </TabsTrigger>
+            <TabsTrigger value="code-check">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Code Compliance
+            </TabsTrigger>
             <TabsTrigger value="3d-view">
               <Box className="w-4 h-4 mr-2" />
               3D View
@@ -184,6 +204,22 @@ const FloorPlanEditor = ({ planId, onBack }: FloorPlanEditorProps) => {
               canvas={canvas}
               planData={plan}
             />
+          </TabsContent>
+
+          <TabsContent value="layout-optimizer">
+            <RoomLayoutOptimizer planId={planId} canvas={canvas} />
+          </TabsContent>
+
+          <TabsContent value="materials">
+            <MaterialLibrary />
+          </TabsContent>
+
+          <TabsContent value="measurements">
+            <MeasurementTools />
+          </TabsContent>
+
+          <TabsContent value="code-check">
+            <BuildingCodeChecker planId={planId} />
           </TabsContent>
 
           <TabsContent value="3d-view">

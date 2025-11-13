@@ -66,6 +66,14 @@ Identify and categorize any problems with the layout:`;
       // Use custom prompts provided by the client for architectural analysis
       systemPrompt = customSystemPrompt || systemPrompt;
       userPrompt = customUserPrompt || userPrompt;
+    } else if (action === 'optimize-layout') {
+      // Use custom prompts for room layout optimization
+      systemPrompt = customSystemPrompt || systemPrompt;
+      userPrompt = customUserPrompt || userPrompt;
+    } else if (action === 'code-check') {
+      // Use custom prompts for building code compliance checking
+      systemPrompt = customSystemPrompt || systemPrompt;
+      userPrompt = customUserPrompt || userPrompt;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -144,6 +152,11 @@ Identify and categorize any problems with the layout:`;
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } else if (action === 'architectural-analysis') {
+      return new Response(
+        JSON.stringify({ report: aiResponse }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } else if (action === 'optimize-layout' || action === 'code-check') {
       return new Response(
         JSON.stringify({ report: aiResponse }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
