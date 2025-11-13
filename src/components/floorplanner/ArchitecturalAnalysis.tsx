@@ -5,10 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle, Info, Sparkles, FileText } from "lucide-react";
+import { AlertCircle, CheckCircle, Info, Sparkles, FileText, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
+import jsPDF from "jspdf";
 
 interface ArchitecturalAnalysisProps {
   planId: string;
@@ -22,6 +23,51 @@ const ArchitecturalAnalysis = ({ planId, canvas, planData }: ArchitecturalAnalys
   const [round1Report, setRound1Report] = useState<string>('');
   const [round2Report, setRound2Report] = useState<string>('');
   const { toast } = useToast();
+
+  const exportToPDF = () => {
+    if (!round1Report && !round2Report) {
+      toast({
+        title: "No analysis to export",
+        description: "Please run an analysis first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const maxWidth = pageWidth - 2 * margin;
+    let yPosition = margin;
+
+    // Title
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Architectural Analysis Report", margin, yPosition);
+    yPosition += 10;
+
+    // Content
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const fullReport = round1Report + '\n\n' + round2Report;
+    const lines = doc.splitTextToSize(fullReport, maxWidth);
+    
+    lines.forEach((line: string) => {
+      if (yPosition > pageHeight - margin) {
+        doc.addPage();
+        yPosition = margin;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+
+    doc.save("architectural-analysis-report.pdf");
+    toast({
+      title: "PDF Exported",
+      description: "Your analysis report has been downloaded",
+    });
+  };
 
   const defaultJsonExample = `{
   "floorPlanName": "Modern Single-Story Ranch",
@@ -225,6 +271,17 @@ ${floorPlanData}
 
       {(round1Report || round2Report) && (
         <Card className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Analysis Reports</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportToPDF}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export PDF
+            </Button>
+          </div>
           <Tabs defaultValue="round1" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="round1" className="flex items-center gap-2">
