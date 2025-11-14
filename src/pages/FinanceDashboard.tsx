@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { DollarSign, TrendingUp, FileText, CreditCard, PieChart, BarChart3, AlertCircle, CheckCircle } from "lucide-react";
+import { DollarSign, TrendingUp, FileText, CreditCard, PieChart, BarChart3, AlertCircle, CheckCircle, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { StatCard } from "@/components/ui/stat-card";
@@ -177,6 +177,14 @@ const FinanceDashboard = () => {
             onClick={() => setShowInvoiceGenerator(true)}
             colorScheme="primary"
             delay={0}
+          />
+          <QuickActionCard
+            title="Procurement & Vendors"
+            description="Full procurement automation system"
+            icon={ShoppingCart}
+            onClick={() => navigate("/procurement")}
+            colorScheme="success"
+            delay={50}
           />
           <QuickActionCard
             title="Expense Tracking"
