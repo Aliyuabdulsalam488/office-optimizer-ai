@@ -13,6 +13,7 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import ProcurementFinanceDashboard from "./pages/ProcurementFinanceDashboard";
+import GlobalFinanceDashboard from "./pages/GlobalFinanceDashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           
           {/* Core MVP Routes - Direct Access */}
           <Route path="/finance-dashboard" element={<FinanceDashboard />} />
+          <Route path="/global-finance" element={<GlobalFinanceDashboard />} />
           <Route path="/procurement" element={<ProcurementFinanceDashboard />} />
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/floor-planner" element={<FloorPlanner />} />

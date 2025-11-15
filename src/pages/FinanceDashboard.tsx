@@ -171,12 +171,20 @@ const FinanceDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <QuickActionCard
+            title="Global Finance System"
+            description="Complete finance management with multi-currency"
+            icon={DollarSign}
+            onClick={() => navigate("/global-finance")}
+            colorScheme="primary"
+            delay={0}
+          />
+          <QuickActionCard
             title="Invoice Management"
             description="Create, track and manage invoices"
             icon={FileText}
             onClick={() => setShowInvoiceGenerator(true)}
-            colorScheme="primary"
-            delay={0}
+            colorScheme="secondary"
+            delay={50}
           />
           <QuickActionCard
             title="Procurement & Vendors"
